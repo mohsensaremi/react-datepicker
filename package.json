@@ -109,13 +109,18 @@
     "webpack-hot-middleware": "^2.25.0"
   },
   "peerDependencies": {
+    "date-fns": "^2.24.0",
     "react": "^16.9.0 || ^17 || ^18",
     "react-dom": "^16.9.0 || ^17 || ^18"
+  },
+  "peerDependenciesMeta": {
+    "date-fns": {
+      "optional": true
+    }
   },
   "dependencies": {
     "@popperjs/core": "^2.9.2",
     "classnames": "^2.2.6",
-    "date-fns": "^2.24.0",
     "prop-types": "^15.7.2",
     "react-onclickoutside": "^6.12.2",
     "react-popper": "^2.3.0"
