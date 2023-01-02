@@ -11,6 +11,7 @@ export const addDays = notImplemented;
 export const addWeeks = notImplemented;
 export const addMonths = notImplemented;
 export const addYears = notImplemented;
+export const addQuarters = notImplemented;
 export const subMinutes = notImplemented;
 export const subHours = notImplemented;
 export const subDays = notImplemented;
