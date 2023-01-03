@@ -1,63 +1,23 @@
-function notImplemented() {
-  throw new Error(`method not implemented`);
-}
+import PropTypes from "prop-types";
+import React from "react";
+import { DateUtils } from "./date_utils";
+import * as provider from "./date_utils_provider";
 
-export const UtilsContext = React.createContext({
-  isDate: notImplemented,
-  isValidDate: notImplemented,
-  format: notImplemented,
-  addMinutes: notImplemented,
-  addHours: notImplemented,
-  addDays: notImplemented,
-  addWeeks: notImplemented,
-  addMonths: notImplemented,
-  addYears: notImplemented,
-  subMinutes: notImplemented,
-  subHours: notImplemented,
-  subDays: notImplemented,
-  subWeeks: notImplemented,
-  subMonths: notImplemented,
-  subYears: notImplemented,
-  getSeconds: notImplemented,
-  getMinutes: notImplemented,
-  getHours: notImplemented,
-  getDay: notImplemented,
-  getDate: notImplemented,
-  getISOWeek: notImplemented,
-  getMonth: notImplemented,
-  getQuarter: notImplemented,
-  getYear: notImplemented,
-  getTime: notImplemented,
-  setSeconds: notImplemented,
-  setMinutes: notImplemented,
-  setHours: notImplemented,
-  setMonth: notImplemented,
-  setQuarter: notImplemented,
-  setYear: notImplemented,
-  min: notImplemented,
-  max: notImplemented,
-  differenceInCalendarDays: notImplemented,
-  differenceInCalendarMonths: notImplemented,
-  differenceInCalendarWeeks: notImplemented,
-  differenceInCalendarYears: notImplemented,
-  startOfDay: notImplemented,
-  startOfWeek: notImplemented,
-  startOfMonth: notImplemented,
-  startOfQuarter: notImplemented,
-  startOfYear: notImplemented,
-  endOfDay: notImplemented,
-  endOfWeek: notImplemented,
-  endOfMonth: notImplemented,
-  dfIsEqual: notImplemented,
-  dfIsSameDay: notImplemented,
-  dfIsSameMonth: notImplemented,
-  dfIsSameYear: notImplemented,
-  dfIsSameQuarter: notImplemented,
-  isAfter: notImplemented,
-  isBefore: notImplemented,
-  isWithinInterval: notImplemented,
-  toDate: notImplemented,
-  parse: notImplemented,
-  parseISO: notImplemented,
-  longFormatters: notImplemented,
-});
+export const UtilsContext = React.createContext(provider);
+
+export class UtilsContextProvider extends React.Component {
+  static propTypes = {
+    children: PropTypes.node,
+    provider: PropTypes.object,
+  };
+
+  render() {
+    const { children, provider } = this.props;
+
+    return (
+      <UtilsContext.Provider value={DateUtils(provider)}>
+        {children}
+      </UtilsContext.Provider>
+    );
+  }
+}

@@ -60,3 +60,4 @@ export const toDate = notImplemented;
 export const parse = notImplemented;
 export const parseISO = notImplemented;
 export const longFormatters = notImplemented;
+export const set = notImplemented;

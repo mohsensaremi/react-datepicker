@@ -1,17 +1,8 @@
-import React from "react";
 import PropTypes from "prop-types";
-import MonthYearDropdownOptions from "./month_year_dropdown_options";
+import React from "react";
 import onClickOutside from "react-onclickoutside";
-import {
-  addMonths,
-  formatDate,
-  getStartOfMonth,
-  isAfter,
-  isSameMonth,
-  isSameYear,
-  newDate,
-  getTime,
-} from "./date_utils";
+import { UtilsContext } from "./context";
+import MonthYearDropdownOptions from "./month_year_dropdown_options";
 
 var WrappedMonthYearDropdownOptions = onClickOutside(MonthYearDropdownOptions);
 
@@ -31,7 +22,12 @@ export default class MonthYearDropdown extends React.Component {
     dropdownVisible: false,
   };
 
+  static contextType = UtilsContext;
+
   renderSelectOptions = () => {
+    const { addMonths, isAfter, getStartOfMonth, getTime, formatDate } =
+      this.context;
+
     let currDate = getStartOfMonth(this.props.minDate);
     const lastDate = getStartOfMonth(this.props.maxDate);
     const options = [];
@@ -56,7 +52,9 @@ export default class MonthYearDropdown extends React.Component {
 
   renderSelectMode = () => (
     <select
-      value={getTime(getStartOfMonth(this.props.date))}
+      value={this.context.getTime(
+        this.context.getStartOfMonth(this.props.date)
+      )}
       className="react-datepicker__month-year-select"
       onChange={this.onSelectChange}
     >
@@ -65,6 +63,7 @@ export default class MonthYearDropdown extends React.Component {
   );
 
   renderReadView = (visible) => {
+    const { formatDate } = this.context;
     const yearMonth = formatDate(
       this.props.date,
       this.props.dateFormat,
@@ -110,6 +109,7 @@ export default class MonthYearDropdown extends React.Component {
   };
 
   onChange = (monthYearPoint) => {
+    const { isSameMonth, isSameYear, newDate } = this.context;
     this.toggleDropdown();
 
     const changedDate = newDate(parseInt(monthYearPoint));

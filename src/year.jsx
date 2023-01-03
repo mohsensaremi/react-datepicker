@@ -1,8 +1,7 @@
-import React from "react";
-import PropTypes from "prop-types";
-import { getYear, newDate } from "./date_utils";
-import * as utils from "./date_utils";
 import classnames from "classnames";
+import PropTypes from "prop-types";
+import React from "react";
+import { UtilsContext } from "./context";
 
 export default class Year extends React.Component {
   static propTypes = {
@@ -22,13 +21,15 @@ export default class Year extends React.Component {
     super(props);
   }
 
+  static contextType = UtilsContext;
+
   YEAR_REFS = [...Array(this.props.yearItemNumber)].map(() =>
     React.createRef()
   );
 
-  isDisabled = (date) => utils.isDayDisabled(date, this.props);
+  isDisabled = (date) => this.context.isDayDisabled(date, this.props);
 
-  isExcluded = (date) => utils.isDayExcluded(date, this.props);
+  isExcluded = (date) => this.context.isDayExcluded(date, this.props);
 
   updateFocusOnPaginate = (refIndex) => {
     const waitForReRender = function () {
@@ -46,7 +47,7 @@ export default class Year extends React.Component {
 
   handleYearNavigation = (newYear, newDate) => {
     const { date, yearItemNumber } = this.props;
-    const { startPeriod } = utils.getYearsPeriod(date, yearItemNumber);
+    const { startPeriod } = this.context.getYearsPeriod(date, yearItemNumber);
 
     if (this.isDisabled(newDate) || this.isExcluded(newDate)) return;
     this.props.setPreSelection(newDate);
@@ -58,23 +59,34 @@ export default class Year extends React.Component {
     } else this.YEAR_REFS[newYear - startPeriod].current.focus();
   };
 
-  isSameDay = (y, other) => utils.isSameDay(y, other);
+  isSameDay = (y, other) => this.context.isSameDay(y, other);
 
-  isCurrentYear = (y) => y === getYear(newDate());
+  isCurrentYear = (y) => y === this.context.getYear(this.context.newDate());
 
   isKeyboardSelected = (y) => {
-    const date = utils.getStartOfYear(utils.setYear(this.props.date, y));
+    const date = this.context.getStartOfYear(
+      this.context.setYear(this.props.date, y)
+    );
     return (
       !this.props.disabledKeyboardNavigation &&
       !this.props.inline &&
-      !utils.isSameDay(date, utils.getStartOfYear(this.props.selected)) &&
-      utils.isSameDay(date, utils.getStartOfYear(this.props.preSelection))
+      !this.context.isSameDay(
+        date,
+        this.context.getStartOfYear(this.props.selected)
+      ) &&
+      this.context.isSameDay(
+        date,
+        this.context.getStartOfYear(this.props.preSelection)
+      )
     );
   };
 
   onYearClick = (e, y) => {
     const { date } = this.props;
-    this.handleYearClick(utils.getStartOfYear(utils.setYear(date, y)), e);
+    this.handleYearClick(
+      this.context.getStartOfYear(this.context.setYear(date, y)),
+      e
+    );
   };
 
   onYearKeyDown = (e, y) => {
@@ -88,13 +100,13 @@ export default class Year extends React.Component {
         case "ArrowRight":
           this.handleYearNavigation(
             y + 1,
-            utils.addYears(this.props.preSelection, 1)
+            this.context.addYears(this.props.preSelection, 1)
           );
           break;
         case "ArrowLeft":
           this.handleYearNavigation(
             y - 1,
-            utils.subYears(this.props.preSelection, 1)
+            this.context.subYears(this.props.preSelection, 1)
           );
           break;
       }
@@ -104,9 +116,10 @@ export default class Year extends React.Component {
   getYearClassNames = (y) => {
     const { minDate, maxDate, selected } = this.props;
     return classnames("react-datepicker__year-text", {
-      "react-datepicker__year-text--selected": y === getYear(selected),
+      "react-datepicker__year-text--selected":
+        y === this.context.getYear(selected),
       "react-datepicker__year-text--disabled":
-        (minDate || maxDate) && utils.isYearDisabled(y, this.props),
+        (minDate || maxDate) && this.context.isYearDisabled(y, this.props),
       "react-datepicker__year-text--keyboard-selected":
         this.isKeyboardSelected(y),
       "react-datepicker__year-text--today": this.isCurrentYear(y),
@@ -115,7 +128,7 @@ export default class Year extends React.Component {
 
   getYearTabIndex = (y) => {
     if (this.props.disabledKeyboardNavigation) return "-1";
-    const preSelected = utils.getYear(this.props.preSelection);
+    const preSelected = this.context.getYear(this.props.preSelection);
 
     return y === preSelected ? "0" : "-1";
   };
@@ -123,7 +136,7 @@ export default class Year extends React.Component {
   render() {
     const yearsList = [];
     const { date, yearItemNumber } = this.props;
-    const { startPeriod, endPeriod } = utils.getYearsPeriod(
+    const { startPeriod, endPeriod } = this.context.getYearsPeriod(
       date,
       yearItemNumber
     );

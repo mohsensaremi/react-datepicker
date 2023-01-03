@@ -1,58 +1,23 @@
-import React from "react";
-import PropTypes from "prop-types";
-import Calendar from "./calendar";
-import Portal from "./portal";
-import PopperComponent, { popperPlacementPositions } from "./popper_component";
 import classnames from "classnames";
-import set from "date-fns/set";
-import startOfDay from "date-fns/startOfDay";
-import endOfDay from "date-fns/endOfDay";
-import {
-  newDate,
-  isDate,
-  isBefore,
-  isAfter,
-  isEqual,
-  setTime,
-  getSeconds,
-  getMinutes,
-  getHours,
-  addDays,
-  addMonths,
-  addWeeks,
-  addYears,
-  subDays,
-  subMonths,
-  subWeeks,
-  subYears,
-  isDayDisabled,
-  isDayInRange,
-  getEffectiveMinDate,
-  getEffectiveMaxDate,
-  parseDate,
-  safeDateFormat,
-  safeDateRangeFormat,
-  getHightLightDaysMap,
-  getYear,
-  getMonth,
-  registerLocale,
-  setDefaultLocale,
-  getDefaultLocale,
-  DEFAULT_YEAR_ITEM_NUMBER,
-  isSameDay,
-} from "./date_utils";
-import TabLoop from "./tab_loop";
+import PropTypes from "prop-types";
+import React from "react";
 import onClickOutside from "react-onclickoutside";
+import Calendar from "./calendar";
+import { UtilsContext } from "./context";
+import { DEFAULT_YEAR_ITEM_NUMBER } from "./date_utils";
+import PopperComponent, { popperPlacementPositions } from "./popper_component";
+import Portal from "./portal";
+import TabLoop from "./tab_loop";
 
 export { default as CalendarContainer } from "./calendar_container";
-
-export { registerLocale, setDefaultLocale, getDefaultLocale };
 
 const outsideClickIgnoreClass = "react-datepicker-ignore-onclickoutside";
 const WrappedCalendar = onClickOutside(Calendar);
 
 // Compares dates year+month combinations
-function hasPreSelectionChanged(date1, date2) {
+function hasPreSelectionChanged(context, date1, date2) {
+  const { getMonth, getYear } = context;
+
   if (date1 && date2) {
     return (
       getMonth(date1) !== getMonth(date2) || getYear(date1) !== getYear(date2)
@@ -300,9 +265,15 @@ export default class DatePicker extends React.Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
+    const { getHightLightDaysMap, isEqual } = this.context;
+
     if (
       prevProps.inline &&
-      hasPreSelectionChanged(prevProps.selected, this.props.selected)
+      hasPreSelectionChanged(
+        this.context,
+        prevProps.selected,
+        this.props.selected
+      )
     ) {
       this.setPreSelection(this.props.selected);
     }
@@ -340,6 +311,8 @@ export default class DatePicker extends React.Component {
     window.removeEventListener("scroll", this.onScroll, true);
   }
 
+  static contextType = UtilsContext;
+
   getPreSelection = () =>
     this.props.openToDate
       ? this.props.openToDate
@@ -347,9 +320,19 @@ export default class DatePicker extends React.Component {
       ? this.props.startDate
       : this.props.selectsStart && this.props.endDate
       ? this.props.endDate
-      : newDate();
+      : this.context.newDate();
 
   calcInitialState = () => {
+    const {
+      getEffectiveMinDate,
+      getEffectiveMaxDate,
+      startOfDay,
+      isBefore,
+      endOfDay,
+      isAfter,
+      getHightLightDaysMap,
+    } = this.context;
+
     const defaultPreSelection = this.getPreSelection();
     const minDate = getEffectiveMinDate(this.props);
     const maxDate = getEffectiveMaxDate(this.props);
@@ -422,7 +405,7 @@ export default class DatePicker extends React.Component {
       }
     );
   };
-  inputOk = () => isDate(this.state.preSelection);
+  inputOk = () => this.context.isDate(this.state.preSelection);
 
   isCalendarOpen = () =>
     this.props.open === undefined
@@ -472,6 +455,8 @@ export default class DatePicker extends React.Component {
   };
 
   handleChange = (...allArgs) => {
+    const { getHours, getMinutes, getSeconds, isSameDay, parseDate, set } =
+      this.context;
     let event = allArgs[0];
     if (this.props.onChangeRaw) {
       this.props.onChangeRaw.apply(this, allArgs);
@@ -510,6 +495,7 @@ export default class DatePicker extends React.Component {
   };
 
   handleSelect = (date, event, monthSelectedIn) => {
+    const { isBefore } = this.context;
     // Preventing onFocus event to fix issue
     // https://github.com/Hacker0x01/react-datepicker/issues/628
     this.setState({ preventFocus: true }, () => {
@@ -537,6 +523,16 @@ export default class DatePicker extends React.Component {
   };
 
   setSelected = (date, event, keepInput, monthSelectedIn) => {
+    const {
+      getHours,
+      getMinutes,
+      getSeconds,
+      isDayDisabled,
+      isEqual,
+      isBefore,
+      setTime,
+    } = this.context;
+
     let changedDate = date;
 
     if (changedDate !== null && isDayDisabled(changedDate, this.props)) {
@@ -601,6 +597,8 @@ export default class DatePicker extends React.Component {
 
   // When checking preSelection via min/maxDate, times need to be manipulated via startOfDay/endOfDay
   setPreSelection = (date) => {
+    const { isAfter, isEqual, isBefore, isDayInRange, endOfDay, startOfDay } =
+      this.context;
     const hasMinDate = typeof this.props.minDate !== "undefined";
     const hasMaxDate = typeof this.props.maxDate !== "undefined";
     let isValidDateSelection = true;
@@ -633,6 +631,8 @@ export default class DatePicker extends React.Component {
   };
 
   handleTimeChange = (time) => {
+    const { getHours, getMinutes, setTime } = this.context;
+
     const selected = this.props.selected
       ? this.props.selected
       : this.getPreSelection();
@@ -664,6 +664,7 @@ export default class DatePicker extends React.Component {
   };
 
   onInputKeyDown = (event) => {
+    const { newDate } = this.context;
     this.props.onKeyDown(event);
     const eventKey = event.key;
 
@@ -740,6 +741,20 @@ export default class DatePicker extends React.Component {
 
   // keyDown events passed down to day.jsx
   onDayKeyDown = (event) => {
+    const {
+      subDays,
+      addDays,
+      subWeeks,
+      addWeeks,
+      subMonths,
+      addMonths,
+      subYears,
+      addYears,
+      getMonth,
+      getYear,
+      newDate,
+    } = this.context;
+
     this.props.onKeyDown(event);
     const eventKey = event.key;
 
@@ -998,6 +1013,7 @@ export default class DatePicker extends React.Component {
   };
 
   renderDateInput = () => {
+    const { safeDateFormat, safeDateRangeFormat } = this.context;
     const className = classnames(this.props.className, {
       [outsideClickIgnoreClass]: this.state.open,
     });

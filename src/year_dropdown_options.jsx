@@ -1,20 +1,20 @@
-import React, { createRef } from "react";
-import PropTypes from "prop-types";
 import classNames from "classnames";
-import { getYear } from "./date_utils";
+import PropTypes from "prop-types";
+import React, { createRef } from "react";
+import { UtilsContext } from "./context";
 
-function generateYears(year, noOfYear, minDate, maxDate) {
+function generateYears(context, year, noOfYear, minDate, maxDate) {
   var list = [];
   for (var i = 0; i < 2 * noOfYear + 1; i++) {
     const newYear = year + noOfYear - i;
     let isInRange = true;
 
     if (minDate) {
-      isInRange = getYear(minDate) <= newYear;
+      isInRange = context.getYear(minDate) <= newYear;
     }
 
     if (maxDate && isInRange) {
-      isInRange = getYear(maxDate) >= newYear;
+      isInRange = context.getYear(maxDate) >= newYear;
     }
 
     if (isInRange) {
@@ -44,6 +44,7 @@ export default class YearDropdownOptions extends React.Component {
 
     this.state = {
       yearsList: generateYears(
+        this.context,
         this.props.year,
         noOfYear,
         this.props.minDate,
@@ -60,6 +61,8 @@ export default class YearDropdownOptions extends React.Component {
         dropdownCurrent.scrollHeight / 2 - dropdownCurrent.clientHeight / 2;
     }
   }
+
+  static contextType = UtilsContext;
 
   renderOptions = () => {
     var selectedYear = this.props.year;
@@ -83,8 +86,12 @@ export default class YearDropdownOptions extends React.Component {
       </div>
     ));
 
-    const minYear = this.props.minDate ? getYear(this.props.minDate) : null;
-    const maxYear = this.props.maxDate ? getYear(this.props.maxDate) : null;
+    const minYear = this.props.minDate
+      ? this.context.getYear(this.props.minDate)
+      : null;
+    const maxYear = this.props.maxDate
+      ? this.context.getYear(this.props.maxDate)
+      : null;
 
     if (!maxYear || !this.state.yearsList.find((year) => year === maxYear)) {
       options.unshift(

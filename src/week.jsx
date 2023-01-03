@@ -1,8 +1,8 @@
-import React from "react";
 import PropTypes from "prop-types";
+import React from "react";
+import { UtilsContext } from "./context";
 import Day from "./day";
 import WeekNumber from "./week_number";
-import * as utils from "./date_utils";
 
 export default class Week extends React.Component {
   static get defaultProps() {
@@ -65,6 +65,8 @@ export default class Week extends React.Component {
     monthShowsDuplicateDaysStart: PropTypes.bool,
   };
 
+  static contextType = UtilsContext;
+
   handleDayClick = (day, event) => {
     if (this.props.onDayClick) {
       this.props.onDayClick(day, event);
@@ -90,11 +92,11 @@ export default class Week extends React.Component {
     if (this.props.formatWeekNumber) {
       return this.props.formatWeekNumber(date);
     }
-    return utils.getWeek(date);
+    return this.context.getWeek(date);
   };
 
   renderDays = () => {
-    const startOfWeek = utils.getStartOfWeek(
+    const startOfWeek = this.context.getStartOfWeek(
       this.props.day,
       this.props.locale,
       this.props.calendarStartDay
@@ -116,7 +118,7 @@ export default class Week extends React.Component {
     }
     return days.concat(
       [0, 1, 2, 3, 4, 5, 6].map((offset) => {
-        const day = utils.addDays(startOfWeek, offset);
+        const day = this.context.addDays(startOfWeek, offset);
         return (
           <Day
             ariaLabelPrefixWhenEnabled={this.props.chooseDayAriaLabelPrefix}

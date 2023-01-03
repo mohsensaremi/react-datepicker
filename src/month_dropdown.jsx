@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import MonthDropdownOptions from "./month_dropdown_options";
 import onClickOutside from "react-onclickoutside";
-import * as utils from "./date_utils";
+import { UtilsContext } from "./context";
 
 const WrappedMonthDropdownOptions = onClickOutside(MonthDropdownOptions);
 
@@ -18,6 +18,8 @@ export default class MonthDropdown extends React.Component {
   state = {
     dropdownVisible: false,
   };
+
+  static contextType = UtilsContext;
 
   renderSelectOptions = (monthNames) =>
     monthNames.map((M, i) => (
@@ -84,8 +86,8 @@ export default class MonthDropdown extends React.Component {
   render() {
     const monthNames = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(
       this.props.useShortMonthInDropdown
-        ? (M) => utils.getMonthShortInLocale(M, this.props.locale)
-        : (M) => utils.getMonthInLocale(M, this.props.locale)
+        ? (M) => this.context.getMonthShortInLocale(M, this.props.locale)
+        : (M) => this.context.getMonthInLocale(M, this.props.locale)
     );
 
     let renderedDropdown;

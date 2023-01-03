@@ -1,20 +1,6 @@
-import React from "react";
 import PropTypes from "prop-types";
-import {
-  getHours,
-  getMinutes,
-  setHours,
-  setMinutes,
-  newDate,
-  getStartOfDay,
-  addMinutes,
-  formatDate,
-  isBefore,
-  isEqual,
-  isTimeInDisabledRange,
-  isTimeDisabled,
-  timesToInjectAfter,
-} from "./date_utils";
+import React from "react";
+import { UtilsContext } from "./context";
 
 export default class Time extends React.Component {
   static get defaultProps() {
@@ -77,14 +63,16 @@ export default class Time extends React.Component {
     }
   }
 
+  static contextType = UtilsContext;
+
   handleClick = (time) => {
     if (
       ((this.props.minTime || this.props.maxTime) &&
-        isTimeInDisabledRange(time, this.props)) ||
+        this.context.isTimeInDisabledRange(time, this.props)) ||
       ((this.props.excludeTimes ||
         this.props.includeTimes ||
         this.props.filterTime) &&
-        isTimeDisabled(time, this.props))
+        this.context.isTimeDisabled(time, this.props))
     ) {
       return;
     }
@@ -93,10 +81,13 @@ export default class Time extends React.Component {
 
   isSelectedTime = (time, currH, currM) =>
     this.props.selected &&
-    currH === getHours(time) &&
-    currM === getMinutes(time);
+    currH === this.context.getHours(time) &&
+    currM === this.context.getMinutes(time);
 
   liClasses = (time, currH, currM) => {
+    const { getHours, getMinutes, isTimeInDisabledRange, isTimeDisabled } =
+      this.context;
+
     let classes = [
       "react-datepicker__time-list-item",
       this.props.timeClassName
@@ -141,6 +132,17 @@ export default class Time extends React.Component {
   };
 
   renderTimes = () => {
+    const {
+      getHours,
+      newDate,
+      getMinutes,
+      setHours,
+      setMinutes,
+      addMinutes,
+      getStartOfDay,
+      timesToInjectAfter,
+    } = this.context;
+
     let times = [];
     const format = this.props.format ? this.props.format : "p";
     const intervals = this.props.intervals;
@@ -181,7 +183,10 @@ export default class Time extends React.Component {
         onClick={this.handleClick.bind(this, time)}
         className={this.liClasses(time, currH, currM)}
         ref={(li) => {
-          if (isBefore(time, activeTime) || isEqual(time, activeTime)) {
+          if (
+            this.context.isBefore(time, activeTime) ||
+            this.context.isEqual(time, activeTime)
+          ) {
             this.centerLi = li;
           }
         }}
@@ -193,7 +198,7 @@ export default class Time extends React.Component {
           this.isSelectedTime(time, currH, currM) ? "true" : undefined
         }
       >
-        {formatDate(time, format, this.props.locale)}
+        {this.context.formatDate(time, format, this.props.locale)}
       </li>
     ));
   };

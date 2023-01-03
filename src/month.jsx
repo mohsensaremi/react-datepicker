@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import classnames from "classnames";
 import Week from "./week";
-import * as utils from "./date_utils";
+import { UtilsContext } from "./context";
 
 const FIXED_HEIGHT_STANDARD_WEEK_COUNT = 6;
 
@@ -73,11 +73,13 @@ export default class Month extends React.Component {
     monthShowsDuplicateDaysStart: PropTypes.bool,
   };
 
+  static contextType = UtilsContext;
+
   MONTH_REFS = [...Array(12)].map(() => React.createRef());
 
-  isDisabled = (date) => utils.isDayDisabled(date, this.props);
+  isDisabled = (date) => this.context.isDayDisabled(date, this.props);
 
-  isExcluded = (date) => utils.isDayExcluded(date, this.props);
+  isExcluded = (date) => this.context.isDayExcluded(date, this.props);
 
   handleDayClick = (day, event) => {
     if (this.props.onDayClick) {
@@ -102,7 +104,7 @@ export default class Month extends React.Component {
     if (!startDate || !endDate) {
       return false;
     }
-    return utils.isSameMonth(utils.setMonth(day, m), startDate);
+    return this.context.isSameMonth(this.context.setMonth(day, m), startDate);
   };
 
   isRangeStartQuarter = (q) => {
@@ -110,7 +112,10 @@ export default class Month extends React.Component {
     if (!startDate || !endDate) {
       return false;
     }
-    return utils.isSameQuarter(utils.setQuarter(day, q), startDate);
+    return this.context.isSameQuarter(
+      this.context.setQuarter(day, q),
+      startDate
+    );
   };
 
   isRangeEndMonth = (m) => {
@@ -118,7 +123,7 @@ export default class Month extends React.Component {
     if (!startDate || !endDate) {
       return false;
     }
-    return utils.isSameMonth(utils.setMonth(day, m), endDate);
+    return this.context.isSameMonth(this.context.setMonth(day, m), endDate);
   };
 
   isRangeEndQuarter = (q) => {
@@ -126,27 +131,30 @@ export default class Month extends React.Component {
     if (!startDate || !endDate) {
       return false;
     }
-    return utils.isSameQuarter(utils.setQuarter(day, q), endDate);
+    return this.context.isSameQuarter(this.context.setQuarter(day, q), endDate);
   };
 
   isWeekInMonth = (startOfWeek) => {
     const day = this.props.day;
-    const endOfWeek = utils.addDays(startOfWeek, 6);
+    const endOfWeek = this.context.addDays(startOfWeek, 6);
     return (
-      utils.isSameMonth(startOfWeek, day) || utils.isSameMonth(endOfWeek, day)
+      this.context.isSameMonth(startOfWeek, day) ||
+      this.context.isSameMonth(endOfWeek, day)
     );
   };
 
   isCurrentMonth = (day, m) =>
-    utils.getYear(day) === utils.getYear(utils.newDate()) &&
-    m === utils.getMonth(utils.newDate());
+    this.context.getYear(day) ===
+      this.context.getYear(this.context.newDate()) &&
+    m === this.context.getMonth(this.context.newDate());
 
   isSelectedMonth = (day, m, selected) =>
-    utils.getMonth(day) === m && utils.getYear(day) === utils.getYear(selected);
+    this.context.getMonth(day) === m &&
+    this.context.getYear(day) === this.context.getYear(selected);
 
   isSelectedQuarter = (day, q, selected) =>
-    utils.getQuarter(day) === q &&
-    utils.getYear(day) === utils.getYear(selected);
+    this.context.getQuarter(day) === q &&
+    this.context.getYear(day) === this.context.getYear(selected);
 
   renderWeeks = () => {
     const weeks = [];
@@ -154,8 +162,8 @@ export default class Month extends React.Component {
 
     let i = 0;
     let breakAfterNextPush = false;
-    let currentWeekStart = utils.getStartOfWeek(
-      utils.getStartOfMonth(this.props.day),
+    let currentWeekStart = this.context.getStartOfWeek(
+      this.context.getStartOfMonth(this.props.day),
       this.props.locale,
       this.props.calendarStartDay
     );
@@ -168,7 +176,7 @@ export default class Month extends React.Component {
           disabledDayAriaLabelPrefix={this.props.disabledDayAriaLabelPrefix}
           key={i}
           day={currentWeekStart}
-          month={utils.getMonth(this.props.day)}
+          month={this.context.getMonth(this.props.day)}
           onDayClick={this.handleDayClick}
           onDayMouseEnter={this.handleDayMouseEnter}
           onWeekSelect={this.props.onWeekSelect}
@@ -211,7 +219,7 @@ export default class Month extends React.Component {
       if (breakAfterNextPush) break;
 
       i++;
-      currentWeekStart = utils.addWeeks(currentWeekStart, 1);
+      currentWeekStart = this.context.addWeeks(currentWeekStart, 1);
 
       // If one of these conditions is true, we will either break on this week
       // or break on the next week
@@ -234,7 +242,7 @@ export default class Month extends React.Component {
 
   onMonthClick = (e, m) => {
     this.handleDayClick(
-      utils.getStartOfMonth(utils.setMonth(this.props.day, m)),
+      this.context.getStartOfMonth(this.context.setMonth(this.props.day, m)),
       e
     );
   };
@@ -258,25 +266,25 @@ export default class Month extends React.Component {
         case "ArrowRight":
           this.handleMonthNavigation(
             month === 11 ? 0 : month + 1,
-            utils.addMonths(this.props.preSelection, 1)
+            this.context.addMonths(this.props.preSelection, 1)
           );
           break;
         case "ArrowLeft":
           this.handleMonthNavigation(
             month === 0 ? 11 : month - 1,
-            utils.subMonths(this.props.preSelection, 1)
+            this.context.subMonths(this.props.preSelection, 1)
           );
           break;
         case "ArrowUp":
           this.handleMonthNavigation(
             month >= 0 && month <= 2 ? month + 9 : month - 3,
-            utils.subMonths(this.props.preSelection, 3)
+            this.context.subMonths(this.props.preSelection, 3)
           );
           break;
         case "ArrowDown":
           this.handleMonthNavigation(
             month >= 9 && month <= 11 ? month - 9 : month + 3,
-            utils.addMonths(this.props.preSelection, 3)
+            this.context.addMonths(this.props.preSelection, 3)
           );
           break;
       }
@@ -285,7 +293,9 @@ export default class Month extends React.Component {
 
   onQuarterClick = (e, q) => {
     this.handleDayClick(
-      utils.getStartOfQuarter(utils.setQuarter(this.props.day, q)),
+      this.context.getStartOfQuarter(
+        this.context.setQuarter(this.props.day, q)
+      ),
       e
     );
   };
@@ -302,14 +312,15 @@ export default class Month extends React.Component {
       monthClassName,
     } = this.props;
     const _monthClassName = monthClassName ? monthClassName(day) : undefined;
-    const labelDate = utils.setMonth(day, m);
+    const labelDate = this.context.setMonth(day, m);
     return classnames(
       "react-datepicker__month-text",
       `react-datepicker__month-${m}`,
       _monthClassName,
       {
         "react-datepicker__month--disabled":
-          ((minDate || maxDate) && utils.isMonthDisabled(labelDate, this.props)) ||
+          ((minDate || maxDate) &&
+            this.context.isMonthDisabled(labelDate, this.props)) ||
           this.isDisabled(labelDate) ||
           this.isExcluded(labelDate),
         "react-datepicker__month--selected": this.isSelectedMonth(
@@ -318,8 +329,8 @@ export default class Month extends React.Component {
           selected
         ),
         "react-datepicker__month-text--keyboard-selected":
-          utils.getMonth(preSelection) === m,
-        "react-datepicker__month--in-range": utils.isMonthinRange(
+          this.context.getMonth(preSelection) === m,
+        "react-datepicker__month--in-range": this.context.isMonthinRange(
           startDate,
           endDate,
           m,
@@ -333,7 +344,7 @@ export default class Month extends React.Component {
   };
 
   getTabIndex = (m) => {
-    const preSelectedMonth = utils.getMonth(this.props.preSelection);
+    const preSelectedMonth = this.context.getMonth(this.props.preSelection);
     const tabIndex =
       !this.props.disabledKeyboardNavigation && m === preSelectedMonth
         ? "0"
@@ -349,13 +360,13 @@ export default class Month extends React.Component {
       day,
     } = this.props;
 
-    const labelDate = utils.setMonth(day, month);
+    const labelDate = this.context.setMonth(day, month);
     const prefix =
       this.isDisabled(labelDate) || this.isExcluded(labelDate)
         ? disabledDayAriaLabelPrefix
         : chooseDayAriaLabelPrefix;
 
-    return `${prefix} ${utils.formatDate(labelDate, "MMMM yyyy")}`;
+    return `${prefix} ${this.context.formatDate(labelDate, "MMMM yyyy")}`;
   };
 
   getQuarterClassNames = (q) => {
@@ -366,13 +377,16 @@ export default class Month extends React.Component {
       {
         "react-datepicker__quarter--disabled":
           (minDate || maxDate) &&
-          utils.isQuarterDisabled(utils.setQuarter(day, q), this.props),
+          this.context.isQuarterDisabled(
+            this.context.setQuarter(day, q),
+            this.props
+          ),
         "react-datepicker__quarter--selected": this.isSelectedQuarter(
           day,
           q,
           selected
         ),
-        "react-datepicker__quarter--in-range": utils.isQuarterInRange(
+        "react-datepicker__quarter--in-range": this.context.isQuarterInRange(
           startDate,
           endDate,
           q,
@@ -437,8 +451,8 @@ export default class Month extends React.Component {
             aria-selected={this.isSelectedMonth(day, m, selected)}
           >
             {showFullMonthYearPicker
-              ? utils.getMonthInLocale(m, locale)
-              : utils.getMonthShortInLocale(m, locale)}
+              ? this.context.getMonthInLocale(m, locale)
+              : this.context.getMonthShortInLocale(m, locale)}
           </div>
         ))}
       </div>
@@ -460,7 +474,7 @@ export default class Month extends React.Component {
             className={this.getQuarterClassNames(q)}
             aria-selected={this.isSelectedQuarter(day, q, selected)}
           >
-            {utils.getQuarterShortInLocale(q, this.props.locale)}
+            {this.context.getQuarterShortInLocale(q, this.props.locale)}
           </div>
         ))}
       </div>
@@ -499,7 +513,10 @@ export default class Month extends React.Component {
       <div
         className={this.getClassNames()}
         onMouseLeave={this.handleMouseLeave}
-        aria-label={`${ariaLabelPrefix} ${utils.formatDate(day, "yyyy-MM")}`}
+        aria-label={`${ariaLabelPrefix} ${this.context.formatDate(
+          day,
+          "yyyy-MM"
+        )}`}
         role="listbox"
       >
         {showMonthYearPicker

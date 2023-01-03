@@ -1,47 +1,16 @@
-import YearDropdown from "./year_dropdown";
+import classnames from "classnames";
+import PropTypes from "prop-types";
+import React from "react";
+import CalendarContainer from "./calendar_container";
+import { UtilsContext } from "./context";
+import { DEFAULT_YEAR_ITEM_NUMBER } from "./date_utils";
+import InputTime from "./inputTime";
+import Month from "./month";
 import MonthDropdown from "./month_dropdown";
 import MonthYearDropdown from "./month_year_dropdown";
-import Month from "./month";
 import Time from "./time";
 import Year from "./year";
-import InputTime from "./inputTime";
-import React from "react";
-import PropTypes from "prop-types";
-import classnames from "classnames";
-import CalendarContainer from "./calendar_container";
-import {
-  newDate,
-  setMonth,
-  getMonth,
-  addMonths,
-  subMonths,
-  getStartOfWeek,
-  getStartOfToday,
-  addDays,
-  formatDate,
-  setYear,
-  getYear,
-  isBefore,
-  addYears,
-  subYears,
-  isAfter,
-  getFormattedWeekdayInLocale,
-  getWeekdayShortInLocale,
-  getWeekdayMinInLocale,
-  isSameDay,
-  monthDisabledBefore,
-  monthDisabledAfter,
-  yearDisabledBefore,
-  yearDisabledAfter,
-  yearsDisabledAfter,
-  yearsDisabledBefore,
-  getEffectiveMinDate,
-  getEffectiveMaxDate,
-  addZero,
-  isValid,
-  getYearsPeriod,
-  DEFAULT_YEAR_ITEM_NUMBER,
-} from "./date_utils";
+import YearDropdown from "./year_dropdown";
 
 const DROPDOWN_FOCUS_CLASSNAMES = [
   "react-datepicker__year-select",
@@ -226,6 +195,7 @@ export default class Calendar extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
+    const { isSameDay } = this.context;
     if (
       this.props.preSelection &&
       !isSameDay(this.props.preSelection, prevProps.preSelection)
@@ -243,6 +213,8 @@ export default class Calendar extends React.Component {
     }
   }
 
+  static contextType = UtilsContext;
+
   handleClickOutside = (event) => {
     this.props.onClickOutside(event);
   };
@@ -258,6 +230,13 @@ export default class Calendar extends React.Component {
   };
 
   getDateInView = () => {
+    const {
+      newDate,
+      isBefore,
+      isAfter,
+      getEffectiveMinDate,
+      getEffectiveMaxDate,
+    } = this.context;
     const { preSelection, selected, openToDate } = this.props;
     const minDate = getEffectiveMinDate(this.props);
     const maxDate = getEffectiveMaxDate(this.props);
@@ -276,6 +255,7 @@ export default class Calendar extends React.Component {
   };
 
   increaseMonth = () => {
+    const { addMonths } = this.context;
     this.setState(
       ({ date }) => ({
         date: addMonths(date, 1),
@@ -285,6 +265,7 @@ export default class Calendar extends React.Component {
   };
 
   decreaseMonth = () => {
+    const { subMonths } = this.context;
     this.setState(
       ({ date }) => ({
         date: subMonths(date, 1),
@@ -346,6 +327,7 @@ export default class Calendar extends React.Component {
   };
 
   changeYear = (year) => {
+    const { setYear } = this.context;
     this.setState(
       ({ date }) => ({
         date: setYear(date, year),
@@ -355,6 +337,7 @@ export default class Calendar extends React.Component {
   };
 
   changeMonth = (month) => {
+    const { setMonth } = this.context;
     this.setState(
       ({ date }) => ({
         date: setMonth(date, month),
@@ -364,6 +347,7 @@ export default class Calendar extends React.Component {
   };
 
   changeMonthYear = (monthYear) => {
+    const { setMonth, getMonth, getYear, setYear } = this.context;
     this.setState(
       ({ date }) => ({
         date: setYear(setMonth(date, getMonth(monthYear)), getYear(monthYear)),
@@ -373,6 +357,7 @@ export default class Calendar extends React.Component {
   };
 
   header = (date = this.state.date) => {
+    const { getStartOfWeek, addDays } = this.context;
     const startOfWeek = getStartOfWeek(
       date,
       this.props.locale,
@@ -412,6 +397,11 @@ export default class Calendar extends React.Component {
   };
 
   formatWeekday = (day, locale) => {
+    const {
+      getFormattedWeekdayInLocale,
+      getWeekdayShortInLocale,
+      getWeekdayMinInLocale,
+    } = this.context;
     if (this.props.formatWeekDay) {
       return getFormattedWeekdayInLocale(day, this.props.formatWeekDay, locale);
     }
@@ -421,6 +411,7 @@ export default class Calendar extends React.Component {
   };
 
   decreaseYear = () => {
+    const { subYears } = this.context;
     this.setState(
       ({ date }) => ({
         date: subYears(
@@ -433,6 +424,8 @@ export default class Calendar extends React.Component {
   };
 
   renderPreviousButton = () => {
+    const { monthDisabledBefore, yearDisabledBefore, yearsDisabledBefore } =
+      this.context;
     if (this.props.renderCustomHeader) {
       return;
     }
@@ -518,6 +511,7 @@ export default class Calendar extends React.Component {
   };
 
   increaseYear = () => {
+    const { addYears } = this.context;
     this.setState(
       ({ date }) => ({
         date: addYears(
@@ -530,6 +524,8 @@ export default class Calendar extends React.Component {
   };
 
   renderNextButton = () => {
+    const { yearDisabledAfter, yearsDisabledAfter, monthDisabledAfter } =
+      this.context;
     if (this.props.renderCustomHeader) {
       return;
     }
@@ -619,6 +615,7 @@ export default class Calendar extends React.Component {
   };
 
   renderCurrentMonth = (date = this.state.date) => {
+    const { formatDate } = this.context;
     const classes = ["react-datepicker__current-month"];
 
     if (this.props.showYearDropdown) {
@@ -638,6 +635,7 @@ export default class Calendar extends React.Component {
   };
 
   renderYearDropdown = (overrideHide = false) => {
+    const { getYear } = this.context;
     if (!this.props.showYearDropdown || overrideHide) {
       return;
     }
@@ -659,6 +657,7 @@ export default class Calendar extends React.Component {
   };
 
   renderMonthDropdown = (overrideHide = false) => {
+    const { getMonth } = this.context;
     if (!this.props.showMonthDropdown || overrideHide) {
       return;
     }
@@ -692,6 +691,7 @@ export default class Calendar extends React.Component {
   };
 
   handleTodayButtonClick = (e) => {
+    const { getStartOfToday } = this.context;
     this.props.onSelect(getStartOfToday(), e);
     this.props.setPreSelection && this.props.setPreSelection(getStartOfToday());
   };
@@ -734,6 +734,12 @@ export default class Calendar extends React.Component {
   );
 
   renderCustomHeader = (headerArgs = {}) => {
+    const {
+      monthDisabledBefore,
+      monthDisabledAfter,
+      yearDisabledBefore,
+      yearDisabledAfter,
+    } = this.context;
     const { monthDate, i } = headerArgs;
 
     if (
@@ -798,6 +804,7 @@ export default class Calendar extends React.Component {
   };
 
   renderYearHeader = () => {
+    const { getYear, getYearsPeriod } = this.context;
     const { date } = this.state;
     const { showYearPicker, yearItemNumber } = this.props;
     const { startPeriod, endPeriod } = getYearsPeriod(date, yearItemNumber);
@@ -822,6 +829,7 @@ export default class Calendar extends React.Component {
   };
 
   renderMonths = () => {
+    const { addMonths, subMonths } = this.context;
     if (this.props.showTimeSelectOnly || this.props.showYearPicker) {
       return;
     }
@@ -965,6 +973,7 @@ export default class Calendar extends React.Component {
   };
 
   renderInputTimeSection = () => {
+    const { addZero, isValid } = this.context;
     const time = new Date(this.props.selected);
     const timeValid = isValid(time) && Boolean(this.props.selected);
     const timeString = timeValid

@@ -1,18 +1,11 @@
-import React from "react";
-import PropTypes from "prop-types";
 import classNames from "classnames";
-import {
-  addMonths,
-  formatDate,
-  getStartOfMonth,
-  newDate,
-  isAfter,
-  isSameMonth,
-  isSameYear,
-  getTime,
-} from "./date_utils";
+import PropTypes from "prop-types";
+import React from "react";
+import { UtilsContext } from "./context";
 
-function generateMonthYears(minDate, maxDate) {
+function generateMonthYears(context, minDate, maxDate) {
+  const { addMonths, getStartOfMonth, newDate, isAfter } = context;
+
   const list = [];
 
   let currDate = getStartOfMonth(minDate);
@@ -43,13 +36,18 @@ export default class MonthYearDropdownOptions extends React.Component {
 
     this.state = {
       monthYearsList: generateMonthYears(
+        this.context,
         this.props.minDate,
         this.props.maxDate
       ),
     };
   }
 
+  static contextType = UtilsContext;
+
   renderOptions = () => {
+    const { formatDate, isSameMonth, isSameYear, getTime } = this.context;
+
     return this.state.monthYearsList.map((monthYear) => {
       const monthYearPoint = getTime(monthYear);
       const isSameMonthYear =
