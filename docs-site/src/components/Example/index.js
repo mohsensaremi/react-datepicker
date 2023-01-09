@@ -19,9 +19,10 @@ export default class CodeExampleComponent extends React.Component {
     example: PropTypes.object.isRequired,
   };
   componentDidMount() {
-    registerLocale("fi", fi);
-    registerLocale("pt-BR", ptBR);
-    registerLocale("en-GB", enGB);
+    const { utils } = this.props;
+    utils.registerLocale("fi", fi);
+    utils.registerLocale("pt-BR", ptBR);
+    utils.registerLocale("en-GB", enGB);
   }
 
   render() {

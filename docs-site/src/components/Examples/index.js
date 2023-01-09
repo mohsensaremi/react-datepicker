@@ -467,6 +467,7 @@ export default class exampleComponents extends React.Component {
   };
 
   render() {
+    const { utils } = this.props;
     return (
       <>
         <h1>Examples</h1>
@@ -492,7 +493,11 @@ export default class exampleComponents extends React.Component {
         </ul>
         <div className="examples">
           {this.examples.map((example) => (
-            <CodeExampleComponent key={example.title} example={example} />
+            <CodeExampleComponent
+              utils={utils}
+              key={example.title}
+              example={example}
+            />
           ))}
         </div>
       </>

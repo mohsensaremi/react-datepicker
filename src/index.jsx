@@ -4,13 +4,14 @@ import React from "react";
 import onClickOutside from "react-onclickoutside";
 import Calendar from "./calendar";
 import { UtilsContext } from "./context";
-import { DEFAULT_YEAR_ITEM_NUMBER } from "./date_utils";
+import { DEFAULT_YEAR_ITEM_NUMBER, DateUtils } from "./date_utils";
 import PopperComponent, { popperPlacementPositions } from "./popper_component";
 import Portal from "./portal";
 import TabLoop from "./tab_loop";
 
 export { default as CalendarContainer } from "./calendar_container";
 export * from "./context";
+export * from "./date_utils";
 
 const outsideClickIgnoreClass = "react-datepicker-ignore-onclickoutside";
 const WrappedCalendar = onClickOutside(Calendar);
