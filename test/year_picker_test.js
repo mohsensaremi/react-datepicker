@@ -5,8 +5,12 @@ import Year from "../src/year";
 import TestUtils from "react-dom/test-utils";
 import { create } from "react-test-renderer";
 import ReactDOM from "react-dom";
-import * as utils from "../src/date_utils";
 import Calendar from "../src/calendar";
+import * as dateFnsProvider from "../provider/date-fns";
+import { UtilsContextProvider } from "../src/context";
+import { DEFAULT_YEAR_ITEM_NUMBER, DateUtils } from "../src/date_utils";
+
+const utils = DateUtils(dateFnsProvider);
 
 describe("YearPicker", () => {
   let sandbox;
@@ -20,21 +24,31 @@ describe("YearPicker", () => {
   });
 
   it("should show year picker component when showYearPicker prop is present", () => {
-    const datePicker = mount(<DatePicker showYearPicker />);
+    const datePicker = mount(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker showYearPicker />
+      </UtilsContextProvider>
+    );
     const component = datePicker.find(Year);
     expect(component).to.exist;
   });
 
   it("should show year picker component with default year item number", () => {
-    const yearComponent = mount(<Year date={new Date()} />);
+    const yearComponent = mount(
+      <UtilsContextProvider utils={utils}>
+        <Year date={new Date()} />
+      </UtilsContextProvider>
+    );
     const yearItems = yearComponent.find(".react-datepicker__year-text");
-    expect(yearItems.length).to.be.eq(utils.DEFAULT_YEAR_ITEM_NUMBER);
+    expect(yearItems.length).to.be.eq(DEFAULT_YEAR_ITEM_NUMBER);
   });
 
   it("should show year picker component with specific year item number", () => {
     const yearItemNumber = 9;
     const yearComponent = mount(
-      <Year date={new Date()} yearItemNumber={yearItemNumber} />
+      <UtilsContextProvider utils={utils}>
+        <Year date={new Date()} yearItemNumber={yearItemNumber} />
+      </UtilsContextProvider>
     );
     const yearItems = yearComponent.find(".react-datepicker__year-text");
     expect(yearItems.length).to.be.eq(yearItemNumber);
@@ -43,7 +57,9 @@ describe("YearPicker", () => {
   it("should change the year when clicked on any option in the picker", () => {
     const onYearChangeSpy = sinon.spy();
     const yearComponent = mount(
-      <Year onDayClick={onYearChangeSpy} date={new Date("2020-05-05")} />
+      <UtilsContextProvider utils={utils}>
+        <Year onDayClick={onYearChangeSpy} date={new Date("2020-05-05")} />
+      </UtilsContextProvider>
     );
     const firstYearDiv = yearComponent
       .find(".react-datepicker__year-text")
@@ -54,7 +70,11 @@ describe("YearPicker", () => {
 
   it("should has selected class when element of array equal of choosen year", () => {
     const date = new Date("2015-01-01");
-    const yearComponent = mount(<Year selected={date} date={date} />);
+    const yearComponent = mount(
+      <UtilsContextProvider utils={utils}>
+        <Year selected={date} date={date} />
+      </UtilsContextProvider>
+    );
     const year = yearComponent
       .find(".react-datepicker__year-text--selected")
       .at(0)
@@ -64,7 +84,11 @@ describe("YearPicker", () => {
 
   it("should have current year class when element of array equal of current year", () => {
     const date = new Date();
-    const yearComponent = mount(<Year date={date} />);
+    const yearComponent = mount(
+      <UtilsContextProvider utils={utils}>
+        <Year date={date} />
+      </UtilsContextProvider>
+    );
     const year = yearComponent
       .find(".react-datepicker__year-text--today")
       .at(0)
@@ -74,7 +98,11 @@ describe("YearPicker", () => {
 
   it("should have aria-current date when element of array equal to current year", () => {
     const date = new Date();
-    const yearComponent = mount(<Year date={date} />);
+    const yearComponent = mount(
+      <UtilsContextProvider utils={utils}>
+        <Year date={date} />
+      </UtilsContextProvider>
+    );
     const ariaCurrent = yearComponent
       .find(".react-datepicker__year-text--today")
       .prop("aria-current");
@@ -83,7 +111,11 @@ describe("YearPicker", () => {
 
   it("should not have aria-current date when element of array does not equal current year", () => {
     const date = new Date("2015-01-01");
-    const yearComponent = mount(<Year date={date} />);
+    const yearComponent = mount(
+      <UtilsContextProvider utils={utils}>
+        <Year date={date} />
+      </UtilsContextProvider>
+    );
     const ariaCurrent = yearComponent
       .find(".react-datepicker__year-text")
       .at(0)
@@ -93,11 +125,13 @@ describe("YearPicker", () => {
 
   it("should return disabled class if current date is out of bound of minDate and maxdate", () => {
     const yearComponent = mount(
-      <Year
-        date={utils.newDate("2020-01-01")}
-        minDate={utils.newDate("2018-01-01")}
-        maxDate={utils.newDate("2025-01-01")}
-      />
+      <UtilsContextProvider utils={utils}>
+        <Year
+          date={utils.newDate("2020-01-01")}
+          minDate={utils.newDate("2018-01-01")}
+          maxDate={utils.newDate("2025-01-01")}
+        />
+      </UtilsContextProvider>
     );
     const year = yearComponent.find(".react-datepicker__year-text").at(0);
     expect(year.hasClass("react-datepicker__year-text--disabled")).to.equal(
@@ -114,15 +148,17 @@ describe("YearPicker", () => {
         utils.setYear(utils.newDate(), 2008)
       );
       const datePicker = TestUtils.renderIntoDocument(
-        <DatePicker
-          selected={utils.newDate("2020-01-01")}
-          adjustDateOnChange
-          showYearPicker
-          onChange={(d) => {
-            date = d;
-          }}
-        />
-      );
+        <UtilsContextProvider utils={utils}>
+          <DatePicker
+            selected={utils.newDate("2020-01-01")}
+            adjustDateOnChange
+            showYearPicker
+            onChange={(d) => {
+              date = d;
+            }}
+          />
+        </UtilsContextProvider>
+      ).children;
       TestUtils.Simulate.focus(ReactDOM.findDOMNode(datePicker.input));
       const calendar = TestUtils.scryRenderedComponentsWithType(
         datePicker.calendar,
@@ -153,15 +189,17 @@ describe("YearPicker", () => {
         utils.setYear(utils.newDate(), 2032)
       );
       const datePicker = TestUtils.renderIntoDocument(
-        <DatePicker
-          selected={utils.newDate("2020-01-01")}
-          adjustDateOnChange
-          showYearPicker
-          onChange={(d) => {
-            date = d;
-          }}
-        />
-      );
+        <UtilsContextProvider utils={utils}>
+          <DatePicker
+            selected={utils.newDate("2020-01-01")}
+            adjustDateOnChange
+            showYearPicker
+            onChange={(d) => {
+              date = d;
+            }}
+          />
+        </UtilsContextProvider>
+      ).children;
       TestUtils.Simulate.focus(ReactDOM.findDOMNode(datePicker.input));
       const calendar = TestUtils.scryRenderedComponentsWithType(
         datePicker.calendar,
@@ -200,15 +238,17 @@ describe("YearPicker", () => {
 
     const getPicker = (initialDate, props) =>
       TestUtils.renderIntoDocument(
-        <Year
-          selected={utils.newDate(initialDate)}
-          date={utils.newDate(initialDate)}
-          setPreSelection={setPreSelection}
-          preSelection={utils.newDate(initialDate)}
-          onDayClick={onDayClick}
-          yearItemNumber={12}
-          {...props}
-        />
+        <UtilsContextProvider utils={utils}>
+          <Year
+            selected={utils.newDate(initialDate)}
+            date={utils.newDate(initialDate)}
+            setPreSelection={setPreSelection}
+            preSelection={utils.newDate(initialDate)}
+            onDayClick={onDayClick}
+            yearItemNumber={12}
+            {...props}
+          />
+        </UtilsContextProvider>
       );
 
     const simulateLeft = (target) =>

@@ -3,7 +3,9 @@ import DatePicker from "../src/index.jsx";
 import TestUtils from "react-dom/test-utils";
 import ReactDOM from "react-dom";
 import Time from "../src/time";
-import { newDate, formatDate } from "../src/date_utils";
+import * as dateFnsProvider from "../provider/date-fns";
+import { UtilsContextProvider } from "../src/context";
+import { DateUtils } from "../src/date_utils";
 
 function getKey(key) {
   switch (key) {
@@ -18,6 +20,9 @@ function getKey(key) {
 }
 
 describe("TimePicker", () => {
+  const utils = DateUtils(dateFnsProvider);
+  const { newDate, formatDate } = utils;
+
   let datePicker;
   let div;
   let onChangeMoment;
@@ -55,9 +60,12 @@ describe("TimePicker", () => {
   });
 
   it("should not close datepicker after time clicked when shouldCloseOnSelect is false", () => {
-    var datePicker = TestUtils.renderIntoDocument(
-      <DatePicker shouldCloseOnSelect={false} showTimeSelect />
+    var wrapper = TestUtils.renderIntoDocument(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker shouldCloseOnSelect={false} showTimeSelect />
+      </UtilsContextProvider>
     );
+    const datePicker = wrapper.children;
     var dateInput = datePicker.input;
     TestUtils.Simulate.focus(ReactDOM.findDOMNode(dateInput));
     const time = TestUtils.findRenderedComponentWithType(datePicker, Time);
@@ -73,16 +81,19 @@ describe("TimePicker", () => {
       }
       return time.getHours() < 12 ? "red" : "green";
     };
-    const timePicker = TestUtils.renderIntoDocument(
-      <DatePicker
-        showTimeSelect
-        showTimeSelectOnly
-        timeClassName={handleTimeColors}
-        onChange={() => console.log("changed")}
-        open
-        focus
-      />
+    const wrapper = TestUtils.renderIntoDocument(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker
+          showTimeSelect
+          showTimeSelectOnly
+          timeClassName={handleTimeColors}
+          onChange={() => console.log("changed")}
+          open
+          focus
+        />
+      </UtilsContextProvider>
     );
+    const timePicker = wrapper.children;
     let redItems = TestUtils.scryRenderedDOMComponentsWithClass(
       timePicker,
       "react-datepicker__time-list-item red"
@@ -140,7 +151,9 @@ describe("TimePicker", () => {
 
   it("should not contain the time only classname in header by default", () => {
     const timePicker = TestUtils.renderIntoDocument(
-      <DatePicker open showTimeSelect />
+      <UtilsContextProvider utils={utils}>
+        <DatePicker open showTimeSelect />
+      </UtilsContextProvider>
     );
     const header = TestUtils.scryRenderedDOMComponentsWithClass(
       timePicker,
@@ -151,7 +164,9 @@ describe("TimePicker", () => {
 
   it("should contain the time only classname in header if enabled", () => {
     const timePicker = TestUtils.renderIntoDocument(
-      <DatePicker open showTimeSelect showTimeSelectOnly />
+      <UtilsContextProvider utils={utils}>
+        <DatePicker open showTimeSelect showTimeSelectOnly />
+      </UtilsContextProvider>
     );
     const header = TestUtils.scryRenderedDOMComponentsWithClass(
       timePicker,
@@ -237,17 +252,20 @@ describe("TimePicker", () => {
   }
 
   function renderDatePickerFor(selected, props) {
-    datePicker = ReactDOM.render(
-      <DatePicker
-        selected={selected}
-        dateFormat={"MMMM d, yyyy p"}
-        allowSameDay
-        onChange={onChange}
-        showTimeSelect
-        {...props}
-      />,
+    const wrapper = ReactDOM.render(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker
+          selected={selected}
+          dateFormat={"MMMM d, yyyy p"}
+          allowSameDay
+          onChange={onChange}
+          showTimeSelect
+          {...props}
+        />
+      </UtilsContextProvider>,
       div
     );
+    datePicker = wrapper.children;
   }
 
   function onChange(m) {

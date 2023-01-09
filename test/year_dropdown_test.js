@@ -3,7 +3,12 @@ import range from "lodash/range";
 import YearDropdown from "../src/year_dropdown.jsx";
 import YearDropdownOptions from "../src/year_dropdown_options.jsx";
 import { mount } from "enzyme";
-import { newDate } from "../src/date_utils";
+import * as dateFnsProvider from "../provider/date-fns";
+import { UtilsContextProvider } from "../src/context";
+import { DateUtils } from "../src/date_utils";
+
+const utils = DateUtils(dateFnsProvider);
+const { newDate } = utils;
 
 describe("YearDropdown", () => {
   var yearDropdown;
@@ -15,12 +20,14 @@ describe("YearDropdown", () => {
 
   function getYearDropdown(overrideProps) {
     return mount(
-      <YearDropdown
-        dropdownMode="scroll"
-        year={2015}
-        onChange={onChangeMock}
-        {...overrideProps}
-      />
+      <UtilsContextProvider utils={utils}>
+        <YearDropdown
+          dropdownMode="scroll"
+          year={2015}
+          onChange={onChangeMock}
+          {...overrideProps}
+        />
+      </UtilsContextProvider>
     );
   }
 

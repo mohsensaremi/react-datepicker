@@ -85,7 +85,7 @@ export default class Day extends React.Component {
   isExcluded = () => this.context.isDayExcluded(this.props.day, this.props);
 
   getHighLightedClass = (defaultClassName) => {
-    const { formatDate } = this.formatDate;
+    const { formatDate } = this.context;
     const { day, highlightDates } = this.props;
 
     if (!highlightDates) {

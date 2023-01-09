@@ -17,8 +17,8 @@ export default class Year extends React.Component {
     yearItemNumber: PropTypes.number,
   };
 
-  constructor(props) {
-    super(props);
+  constructor(props, context) {
+    super(props, context);
   }
 
   static contextType = UtilsContext;

@@ -1,20 +1,29 @@
+import { shallow } from "enzyme";
 import React from "react";
+import { withContext } from "shallow-with-context";
+import sinon from "sinon";
+import * as dateFnsProvider from "../provider/date-fns";
+import { DateUtils } from "../src/date_utils";
+import Day from "../src/day";
 import Week from "../src/week";
 import WeekNumber from "../src/week_number";
-import Day from "../src/day";
-import { shallow } from "enzyme";
-import sinon from "sinon";
-import * as utils from "../src/date_utils";
 
 describe("Week", () => {
+  const utils = DateUtils(dateFnsProvider);
+  const ComponentWithContext = withContext(Week, utils);
+
   it("should have the week CSS class", () => {
-    const week = shallow(<Week day={utils.newDate()} />);
+    const week = shallow(<ComponentWithContext day={utils.newDate()} />, {
+      context: utils,
+    });
     expect(week.hasClass("react-datepicker__week")).to.equal(true);
   });
 
   it("should render the days of the week", () => {
     const weekStart = utils.getStartOfWeek(utils.newDate("2015-12-20"));
-    const week = shallow(<Week day={weekStart} />);
+    const week = shallow(<ComponentWithContext day={weekStart} />, {
+      context: utils,
+    });
 
     const days = week.find(Day);
     expect(days.length).to.equal(7);
@@ -29,7 +38,10 @@ describe("Week", () => {
 
   it("should render the week number", () => {
     const weekStart = utils.getStartOfWeek(utils.newDate("2015-12-20"));
-    const week = shallow(<Week showWeekNumber day={weekStart} />);
+    const week = shallow(
+      <ComponentWithContext showWeekNumber day={weekStart} />,
+      { context: utils }
+    );
 
     const days = week.find(Day);
     expect(days.length).to.equal(7);
@@ -50,7 +62,10 @@ describe("Week", () => {
     }
 
     const weekStart = utils.newDate("2015-12-20");
-    const week = shallow(<Week day={weekStart} onDayClick={onDayClick} />);
+    const week = shallow(
+      <ComponentWithContext day={weekStart} onDayClick={onDayClick} />,
+      { context: utils }
+    );
     const day = week.find(Day).at(0);
     day.simulate("click");
     assert(utils.isSameDay(day.prop("day"), dayClicked));
@@ -66,12 +81,13 @@ describe("Week", () => {
     const weekStart = utils.newDate("2015-12-20");
     const setOpenSpy = sinon.spy();
     const week = shallow(
-      <Week
+      <ComponentWithContext
         day={weekStart}
         showWeekNumber
         onWeekSelect={onWeekClick}
         setOpen={setOpenSpy}
-      />
+      />,
+      { context: utils }
     );
     const weekNumberElement = week.find(WeekNumber);
     weekNumberElement.simulate("click");
@@ -83,13 +99,14 @@ describe("Week", () => {
     const setOpenSpy = sinon.spy();
 
     const week = shallow(
-      <Week
+      <ComponentWithContext
         day={weekStart}
         showWeekNumber
         shouldCloseOnSelect
         onWeekSelect={() => {}}
         setOpen={setOpenSpy}
-      />
+      />,
+      { context: utils }
     );
 
     const weekNumberElement = week.find(WeekNumber);
@@ -102,13 +119,14 @@ describe("Week", () => {
     const setOpenSpy = sinon.spy();
 
     const week = shallow(
-      <Week
+      <ComponentWithContext
         day={weekStart}
         showWeekNumber
         shouldCloseOnSelect={false}
         onWeekSelect={() => {}}
         setOpen={setOpenSpy}
-      />
+      />,
+      { context: utils }
     );
 
     const weekNumberElement = week.find(WeekNumber);
@@ -126,12 +144,13 @@ describe("Week", () => {
     const weekStart = utils.newDate("2015-12-20");
     const realWeekNumber = utils.getWeek(weekStart);
     const week = shallow(
-      <Week
+      <ComponentWithContext
         day={weekStart}
         showWeekNumber
         shouldCloseOnSelect={false}
         onWeekSelect={onWeekClick}
-      />
+      />,
+      { context: utils }
     );
     const weekNumberElement = week.find(WeekNumber);
     weekNumberElement.simulate("click");
@@ -148,11 +167,12 @@ describe("Week", () => {
 
     const weekStart = utils.newDate("2015-12-20");
     const week = shallow(
-      <Week
+      <ComponentWithContext
         day={weekStart}
         showWeekNumber
         formatWeekNumber={weekNumberFormatter}
-      />
+      />,
+      { context: utils }
     );
     const weekNumberElement = week.find(WeekNumber);
 
@@ -169,7 +189,11 @@ describe("Week", () => {
 
     const weekStart = utils.newDate();
     const week = shallow(
-      <Week day={weekStart} onDayMouseEnter={onDayMouseEnter} />
+      <ComponentWithContext
+        day={weekStart}
+        onDayMouseEnter={onDayMouseEnter}
+      />,
+      { context: utils }
     );
     const day = week.find(Day).first();
     day.simulate("mouseenter");

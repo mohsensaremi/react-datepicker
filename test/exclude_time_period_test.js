@@ -1,9 +1,12 @@
-import React from "react";
 import { mount } from "enzyme";
-import * as utils from "../src/date_utils";
+import React from "react";
+import * as dateFnsProvider from "../provider/date-fns";
+import { UtilsContextProvider } from "../src/context";
+import { DateUtils } from "../src/date_utils";
 import DatePicker from "../src/index.jsx";
 
 describe("DatePicker", () => {
+  const utils = DateUtils(dateFnsProvider);
   let sandbox;
 
   beforeEach(() => {
@@ -17,13 +20,15 @@ describe("DatePicker", () => {
   it("should only display times between minTime and maxTime", () => {
     var now = utils.newDate();
     var datePicker = mount(
-      <DatePicker
-        showTimeSelect
-        selected={now}
-        onChange={() => null}
-        minTime={utils.setTime(now, { hours: 17, minutes: 0 })}
-        maxTime={utils.setTime(now, { hours: 18, minutes: 0 })}
-      />
+      <UtilsContextProvider utils={utils}>
+        <DatePicker
+          showTimeSelect
+          selected={now}
+          onChange={() => null}
+          minTime={utils.setTime(now, { hours: 17, minutes: 0 })}
+          maxTime={utils.setTime(now, { hours: 18, minutes: 0 })}
+        />
+      </UtilsContextProvider>
     );
     var times = datePicker.find("li.react-datepicker__time-list-item");
     expect(times).to.exist;

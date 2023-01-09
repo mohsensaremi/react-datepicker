@@ -36,8 +36,8 @@ export default class YearDropdownOptions extends React.Component {
     yearDropdownItemNumber: PropTypes.number,
   };
 
-  constructor(props) {
-    super(props);
+  constructor(props, context) {
+    super(props, context);
     const { yearDropdownItemNumber, scrollableYearDropdown } = props;
     const noOfYear =
       yearDropdownItemNumber || (scrollableYearDropdown ? 10 : 5);

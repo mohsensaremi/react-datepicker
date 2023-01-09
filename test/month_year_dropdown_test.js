@@ -2,17 +2,16 @@ import React from "react";
 import MonthYearDropdown from "../src/month_year_dropdown.jsx";
 import MonthYearDropdownOptions from "../src/month_year_dropdown_options.jsx";
 import { mount } from "enzyme";
-import {
-  newDate,
-  addMonths,
-  subMonths,
-  formatDate,
-  isAfter,
-  registerLocale,
-} from "../src/date_utils";
 import fi from "date-fns/locale/fi";
+import * as dateFnsProvider from "../provider/date-fns";
+import { UtilsContextProvider } from "../src/context";
+import { DateUtils } from "../src/date_utils";
 
 describe("MonthYearDropdown", () => {
+  const utils = DateUtils(dateFnsProvider);
+  const { newDate, addMonths, subMonths, formatDate, isAfter, registerLocale } =
+    utils;
+
   let monthYearDropdown;
   let handleChangeResult;
   const mockHandleChange = function (changeInput) {
@@ -27,15 +26,17 @@ describe("MonthYearDropdown", () => {
     const maxDate = newDate("2018-06-30");
 
     return mount(
-      <MonthYearDropdown
-        dropdownMode="scroll"
-        date={date}
-        dateFormat={dateFormatCalendar}
-        minDate={minDate}
-        maxDate={maxDate}
-        onChange={mockHandleChange}
-        {...overrideProps}
-      />
+      <UtilsContextProvider utils={utils}>
+        <MonthYearDropdown
+          dropdownMode="scroll"
+          date={date}
+          dateFormat={dateFormatCalendar}
+          minDate={minDate}
+          maxDate={maxDate}
+          onChange={mockHandleChange}
+          {...overrideProps}
+        />
+      </UtilsContextProvider>
     );
   }
 
@@ -87,15 +88,19 @@ describe("MonthYearDropdown", () => {
 
       const onCancelSpy = sandbox.spy();
       const monthYearDropdownOptionsInstance = mount(
-        <MonthYearDropdownOptions
-          onCancel={onCancelSpy}
-          onChange={sandbox.spy()}
-          dateFormat={dateFormatCalendar}
-          date={date}
-          minDate={subMonths(date, 6)}
-          maxDate={addMonths(date, 6)}
-        />
-      ).instance();
+        <UtilsContextProvider utils={utils}>
+          <MonthYearDropdownOptions
+            onCancel={onCancelSpy}
+            onChange={sandbox.spy()}
+            dateFormat={dateFormatCalendar}
+            date={date}
+            minDate={subMonths(date, 6)}
+            maxDate={addMonths(date, 6)}
+          />
+        </UtilsContextProvider>
+      )
+        .find(MonthYearDropdownOptions)
+        .instance();
       monthYearDropdownOptionsInstance.handleClickOutside();
       expect(onCancelSpy.calledOnce).to.be.true;
     });

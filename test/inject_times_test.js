@@ -1,10 +1,12 @@
-import React from "react";
 import { mount } from "enzyme";
-import * as utils from "../src/date_utils";
-import { setTime, newDate } from "../src/date_utils";
+import React from "react";
+import * as dateFnsProvider from "../provider/date-fns";
+import { UtilsContextProvider } from "../src/context";
+import { DateUtils } from "../src/date_utils";
 import TimeComponent from "../src/time";
 
 describe("TimeComponent", () => {
+  const utils = DateUtils(dateFnsProvider);
   let sandbox;
 
   beforeEach(() => {
@@ -18,13 +20,15 @@ describe("TimeComponent", () => {
   it("should show times specified in injectTimes props", () => {
     const today = utils.getStartOfDay(utils.newDate());
     const timeComponent = mount(
-      <TimeComponent
-        injectTimes={[
-          utils.addMinutes(today, 1),
-          utils.addMinutes(today, 725),
-          utils.addMinutes(today, 1439),
-        ]}
-      />
+      <UtilsContextProvider utils={utils}>
+        <TimeComponent
+          injectTimes={[
+            utils.addMinutes(today, 1),
+            utils.addMinutes(today, 725),
+            utils.addMinutes(today, 1439),
+          ]}
+        />
+      </UtilsContextProvider>
     );
 
     const injectedItems = timeComponent.find(
@@ -36,14 +40,16 @@ describe("TimeComponent", () => {
   it("should not affect existing time intervals", () => {
     const today = utils.getStartOfDay(utils.newDate());
     const timeComponent = mount(
-      <TimeComponent
-        timeIntervals={60}
-        injectTimes={[
-          utils.addMinutes(today, 0),
-          utils.addMinutes(today, 60),
-          utils.addMinutes(today, 1440),
-        ]}
-      />
+      <UtilsContextProvider utils={utils}>
+        <TimeComponent
+          timeIntervals={60}
+          injectTimes={[
+            utils.addMinutes(today, 0),
+            utils.addMinutes(today, 60),
+            utils.addMinutes(today, 1440),
+          ]}
+        />
+      </UtilsContextProvider>
     );
 
     const injectedItems = timeComponent.find(
@@ -55,14 +61,16 @@ describe("TimeComponent", () => {
   it("should allow multiple injected times per interval", () => {
     const today = utils.getStartOfDay(utils.newDate());
     const timeComponent = mount(
-      <TimeComponent
-        timeIntervals={60}
-        injectTimes={[
-          utils.addMinutes(today, 1),
-          utils.addMinutes(today, 2),
-          utils.addMinutes(today, 3),
-        ]}
-      />
+      <UtilsContextProvider utils={utils}>
+        <TimeComponent
+          timeIntervals={60}
+          injectTimes={[
+            utils.addMinutes(today, 1),
+            utils.addMinutes(today, 2),
+            utils.addMinutes(today, 3),
+          ]}
+        />
+      </UtilsContextProvider>
     );
 
     const injectedItems = timeComponent.find(
@@ -74,14 +82,16 @@ describe("TimeComponent", () => {
   it("should sort injected times automatically", () => {
     const today = utils.getStartOfDay(utils.newDate());
     const timeComponent = mount(
-      <TimeComponent
-        timeIntervals={60}
-        injectTimes={[
-          utils.addMinutes(today, 3),
-          utils.addMinutes(today, 1),
-          utils.addMinutes(today, 2),
-        ]}
-      />
+      <UtilsContextProvider utils={utils}>
+        <TimeComponent
+          timeIntervals={60}
+          injectTimes={[
+            utils.addMinutes(today, 3),
+            utils.addMinutes(today, 1),
+            utils.addMinutes(today, 2),
+          ]}
+        />
+      </UtilsContextProvider>
     );
 
     const injectedItems = timeComponent.find(

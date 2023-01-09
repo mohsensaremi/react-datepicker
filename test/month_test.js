@@ -1,12 +1,14 @@
-import React from "react";
-import ReactDOM from "react-dom";
-import Month from "../src/month";
-import Day from "../src/day";
-import range from "lodash/range";
 import { mount, shallow } from "enzyme";
-import * as utils from "../src/date_utils";
+import range from "lodash/range";
+import React from "react";
 import TestUtils from "react-dom/test-utils";
+import * as dateFnsProvider from "../provider/date-fns";
+import { UtilsContextProvider } from "../src/context";
+import { DateUtils } from "../src/date_utils";
+import Day from "../src/day";
+import Month from "../src/month";
 import { runAxe } from "./run_axe";
+import { withContext } from "shallow-with-context";
 
 function getKey(key) {
   switch (key) {
@@ -27,6 +29,9 @@ function getKey(key) {
 }
 
 describe("Month", () => {
+  const utils = DateUtils(dateFnsProvider);
+  const ComponentWithContext = withContext(Month, utils);
+
   function assertDateRangeInclusive(month, start, end) {
     const dayCount = utils.getDaysDiff(end, start) + 1;
     const days = month.find(Day);
@@ -48,20 +53,28 @@ describe("Month", () => {
     const className = "customClassName";
     const monthClassNameFunc = (date) => className;
     const month = shallow(
-      <Month day={utils.newDate()} monthClassName={monthClassNameFunc} />
+      <ComponentWithContext
+        day={utils.newDate()}
+        monthClassName={monthClassNameFunc}
+      />,
+      { context: utils }
     );
     expect(month.hasClass(className)).to.equal(true);
   });
 
   it("should have the month CSS class", () => {
-    const month = shallow(<Month day={utils.newDate()} />);
+    const month = shallow(<ComponentWithContext day={utils.newDate()} />, {
+      context: utils,
+    });
     expect(month.hasClass("react-datepicker__month")).to.equal(true);
   });
 
   it("should have the month aria-label", () => {
     const dateString = "2015-12";
     const month = TestUtils.renderIntoDocument(
-      <Month day={utils.newDate(`${dateString}-01`)} />
+      <UtilsContextProvider utils={utils}>
+        <Month day={utils.newDate(`${dateString}-01`)} />
+      </UtilsContextProvider>
     );
     const month_dom = TestUtils.findRenderedDOMComponentWithClass(
       month,
@@ -72,19 +85,25 @@ describe("Month", () => {
 
   it("should have an aria-label containing the provided prefix", () => {
     const ariaLabelPrefix = "A prefix in my native language";
-    const shallowMonth = shallow(
-      <Month ariaLabelPrefix={ariaLabelPrefix} day={utils.newDate()} />
+    const wrapper = mount(
+      <UtilsContextProvider utils={utils}>
+        <Month ariaLabelPrefix={ariaLabelPrefix} day={utils.newDate()} />
+      </UtilsContextProvider>
     );
-    expect(
-      shallowMonth.html().indexOf(`aria-label="${ariaLabelPrefix}`)
-    ).not.equal(-1);
+    expect(wrapper.html().indexOf(`aria-label="${ariaLabelPrefix}`)).not.equal(
+      -1
+    );
   });
 
   it("should render all days of the month and some days in neighboring months", () => {
     const monthStart = utils.newDate("2015-12-01");
 
     assertDateRangeInclusive(
-      mount(<Month day={monthStart} />),
+      mount(
+        <UtilsContextProvider utils={utils}>
+          <Month day={monthStart} />
+        </UtilsContextProvider>
+      ),
       utils.getStartOfWeek(monthStart),
       utils.getEndOfWeek(utils.getEndOfMonth(monthStart))
     );
@@ -94,7 +113,11 @@ describe("Month", () => {
     const monthStart = utils.newDate("2015-12-01");
 
     assertDateRangeInclusive(
-      mount(<Month day={monthStart} peekNextMonth />),
+      mount(
+        <UtilsContextProvider utils={utils}>
+          <Month day={monthStart} peekNextMonth />
+        </UtilsContextProvider>
+      ),
       utils.getStartOfWeek(monthStart),
       utils.getEndOfWeek(utils.addWeeks(utils.addMonths(monthStart, 1), 1))
     );
@@ -105,7 +128,11 @@ describe("Month", () => {
     const calendarStart = utils.getStartOfWeek(monthStart);
 
     assertDateRangeInclusive(
-      mount(<Month day={monthStart} fixedHeight />),
+      mount(
+        <UtilsContextProvider utils={utils}>
+          <Month day={monthStart} fixedHeight />
+        </UtilsContextProvider>
+      ),
       calendarStart,
       utils.getEndOfWeek(utils.addWeeks(calendarStart, 5))
     );
@@ -116,7 +143,11 @@ describe("Month", () => {
     const calendarStart = utils.getStartOfWeek(monthStart);
 
     assertDateRangeInclusive(
-      mount(<Month day={monthStart} fixedHeight peekNextMonth />),
+      mount(
+        <UtilsContextProvider utils={utils}>
+          <Month day={monthStart} fixedHeight peekNextMonth />
+        </UtilsContextProvider>
+      ),
       calendarStart,
       utils.getEndOfWeek(utils.addWeeks(calendarStart, 6))
     );
@@ -130,7 +161,11 @@ describe("Month", () => {
     }
 
     const monthStart = utils.newDate("2015-12-01");
-    const month = mount(<Month day={monthStart} onDayClick={onDayClick} />);
+    const month = mount(
+      <UtilsContextProvider utils={utils}>
+        <Month day={monthStart} onDayClick={onDayClick} />
+      </UtilsContextProvider>
+    );
     const day = month.find(Day).at(0);
 
     day.simulate("click");
@@ -145,7 +180,11 @@ describe("Month", () => {
     }
 
     const month = shallow(
-      <Month day={utils.newDate()} onMouseLeave={onMouseLeave} />
+      <ComponentWithContext
+        day={utils.newDate()}
+        onMouseLeave={onMouseLeave}
+      />,
+      { context: utils }
     );
     month.simulate("mouseleave");
     expect(mouseLeaveCalled).to.be.true;
@@ -159,7 +198,9 @@ describe("Month", () => {
     }
 
     const month = mount(
-      <Month day={utils.newDate()} onDayMouseEnter={onDayMouseEnter} />
+      <UtilsContextProvider utils={utils}>
+        <Month day={utils.newDate()} onDayMouseEnter={onDayMouseEnter} />
+      </UtilsContextProvider>
     );
     const day = month.find(Day).first();
     day.simulate("mouseenter");
@@ -175,11 +216,13 @@ describe("Month", () => {
     }
 
     const month = mount(
-      <Month
-        day={utils.newDate()}
-        orderInDisplay={order}
-        onDayClick={onDayClick}
-      />
+      <UtilsContextProvider utils={utils}>
+        <Month
+          day={utils.newDate()}
+          orderInDisplay={order}
+          onDayClick={onDayClick}
+        />
+      </UtilsContextProvider>
     );
     const day = month.find(Day).at(0);
 
@@ -188,7 +231,10 @@ describe("Month", () => {
   });
 
   it("should have the month picker CSS class", () => {
-    const month = shallow(<Month showMonthYearPicker day={utils.newDate()} />);
+    const month = shallow(
+      <ComponentWithContext showMonthYearPicker day={utils.newDate()} />,
+      { context: utils }
+    );
     expect(month.hasClass("react-datepicker__monthPicker")).to.equal(true);
   });
 
@@ -201,7 +247,9 @@ describe("Month", () => {
 
     const monthStart = utils.newDate("2015-12-01");
     const monthComponent = mount(
-      <Month day={monthStart} showMonthYearPicker onDayClick={onDayClick} />
+      <UtilsContextProvider utils={utils}>
+        <Month day={monthStart} showMonthYearPicker onDayClick={onDayClick} />
+      </UtilsContextProvider>
     );
     const month = monthComponent.find(".react-datepicker__month-text").at(6);
     month.simulate("click");
@@ -210,12 +258,14 @@ describe("Month", () => {
 
   it("should return disabled class if current date is out of bound of minDate and maxdate", () => {
     const monthComponent = mount(
-      <Month
-        day={utils.newDate("2015-12-01")}
-        minDate={utils.newDate("2016-02-01")}
-        maxDate={utils.newDate()}
-        showMonthYearPicker
-      />
+      <UtilsContextProvider utils={utils}>
+        <Month
+          day={utils.newDate("2015-12-01")}
+          minDate={utils.newDate("2016-02-01")}
+          maxDate={utils.newDate()}
+          showMonthYearPicker
+        />
+      </UtilsContextProvider>
     );
     const month = monthComponent.find(".react-datepicker__month-text").at(0);
     expect(month.hasClass("react-datepicker__month--disabled")).to.equal(true);
@@ -223,11 +273,13 @@ describe("Month", () => {
 
   it("should have no axe violations", () => {
     const monthComponent = mount(
-      <Month
-        day={utils.newDate("2015-02-01")}
-        selected={utils.newDate("2015-02-01")}
-        preSelection={utils.newDate("2015-02-03")}
-      />
+      <UtilsContextProvider utils={utils}>
+        <Month
+          day={utils.newDate("2015-02-01")}
+          selected={utils.newDate("2015-02-01")}
+          preSelection={utils.newDate("2015-02-03")}
+        />
+      </UtilsContextProvider>
     );
     return runAxe(monthComponent.getDOMNode());
   });
@@ -238,12 +290,14 @@ describe("Month", () => {
 
     beforeEach(() => {
       monthComponent = mount(
-        <Month
-          day={utils.newDate("2015-02-01")}
-          selected={utils.newDate("2015-02-01")}
-          preSelection={utils.newDate("2015-03-01")}
-          showMonthYearPicker
-        />
+        <UtilsContextProvider utils={utils}>
+          <Month
+            day={utils.newDate("2015-02-01")}
+            selected={utils.newDate("2015-02-01")}
+            preSelection={utils.newDate("2015-03-01")}
+            showMonthYearPicker
+          />
+        </UtilsContextProvider>
       );
       month = monthComponent.find(".react-datepicker__month-text").at(1);
     });
@@ -267,11 +321,13 @@ describe("Month", () => {
 
     beforeEach(() => {
       const monthComponent = mount(
-        <Month
-          day={utils.newDate("2015-02-01")}
-          selected={utils.newDate("2015-02-01")}
-          showMonthYearPicker
-        />
+        <UtilsContextProvider utils={utils}>
+          <Month
+            day={utils.newDate("2015-02-01")}
+            selected={utils.newDate("2015-02-01")}
+            showMonthYearPicker
+          />
+        </UtilsContextProvider>
       );
       month = monthComponent.find(".react-datepicker__month-text").at(0);
     });
@@ -291,12 +347,14 @@ describe("Month", () => {
 
   it("should return month-in-range class if month is between the start date and end date", () => {
     const monthComponent = mount(
-      <Month
-        day={utils.newDate("2015-02-01")}
-        startDate={utils.newDate("2015-01-01")}
-        endDate={utils.newDate("2015-08-01")}
-        showMonthYearPicker
-      />
+      <UtilsContextProvider utils={utils}>
+        <Month
+          day={utils.newDate("2015-02-01")}
+          startDate={utils.newDate("2015-01-01")}
+          endDate={utils.newDate("2015-08-01")}
+          showMonthYearPicker
+        />
+      </UtilsContextProvider>
     );
     const quarter = monthComponent.find(".react-datepicker__month-text").at(2);
     expect(quarter.hasClass("react-datepicker__month--in-range")).to.equal(
@@ -307,7 +365,9 @@ describe("Month", () => {
   it("should return month-text--today class if month is current year's month", () => {
     const date = new Date();
     const monthComponent = mount(
-      <Month day={date} selected={date} showMonthYearPicker />
+      <UtilsContextProvider utils={utils}>
+        <Month day={date} selected={date} showMonthYearPicker />
+      </UtilsContextProvider>
     );
     const month = monthComponent
       .find(".react-datepicker__month-text--today")
@@ -320,7 +380,9 @@ describe("Month", () => {
     const lastYearDate = new Date();
     lastYearDate.setFullYear(lastYearDate.getFullYear() - 1);
     const monthComponent = mount(
-      <Month day={lastYearDate} selected={lastYearDate} showMonthYearPicker />
+      <UtilsContextProvider utils={utils}>
+        <Month day={lastYearDate} selected={lastYearDate} showMonthYearPicker />
+      </UtilsContextProvider>
     );
     const months = monthComponent.find(".react-datepicker__month-text--today");
     expect(months).to.have.length(0);
@@ -329,7 +391,9 @@ describe("Month", () => {
   it("should include aria-current property if month is current year's month", () => {
     const date = new Date();
     const monthComponent = mount(
-      <Month day={date} selected={date} showMonthYearPicker />
+      <UtilsContextProvider utils={utils}>
+        <Month day={date} selected={date} showMonthYearPicker />
+      </UtilsContextProvider>
     );
     const ariaCurrent = monthComponent
       .find(".react-datepicker__month-text--today")
@@ -341,7 +405,9 @@ describe("Month", () => {
     const lastYearDate = new Date();
     lastYearDate.setFullYear(lastYearDate.getFullYear() - 1);
     const monthComponent = mount(
-      <Month day={lastYearDate} selected={lastYearDate} showMonthYearPicker />
+      <UtilsContextProvider utils={utils}>
+        <Month day={lastYearDate} selected={lastYearDate} showMonthYearPicker />
+      </UtilsContextProvider>
     );
     const ariaCurrent = monthComponent
       .find(".react-datepicker__month-text")
@@ -352,7 +418,8 @@ describe("Month", () => {
 
   it("should have the quarter picker CSS class", () => {
     const month = shallow(
-      <Month showQuarterYearPicker day={utils.newDate()} />
+      <ComponentWithContext showQuarterYearPicker day={utils.newDate()} />,
+      { context: utils }
     );
     expect(month.hasClass("react-datepicker__quarterPicker")).to.equal(true);
   });
@@ -366,7 +433,9 @@ describe("Month", () => {
 
     const monthStart = utils.newDate("2015-12-01");
     const monthComponent = mount(
-      <Month day={monthStart} showQuarterYearPicker onDayClick={onDayClick} />
+      <UtilsContextProvider utils={utils}>
+        <Month day={monthStart} showQuarterYearPicker onDayClick={onDayClick} />
+      </UtilsContextProvider>
     );
     const quarter = monthComponent
       .find(".react-datepicker__quarter-text")
@@ -377,12 +446,14 @@ describe("Month", () => {
 
   it("should return disabled class if current date is out of bound of minDate and maxdate", () => {
     const monthComponent = mount(
-      <Month
-        day={utils.newDate("2015-12-01")}
-        minDate={utils.newDate("2016-02-01")}
-        maxDate={utils.newDate()}
-        showQuarterYearPicker
-      />
+      <UtilsContextProvider utils={utils}>
+        <Month
+          day={utils.newDate("2015-12-01")}
+          minDate={utils.newDate("2016-02-01")}
+          maxDate={utils.newDate()}
+          showQuarterYearPicker
+        />
+      </UtilsContextProvider>
     );
     const quarter = monthComponent
       .find(".react-datepicker__quarter-text")
@@ -398,12 +469,14 @@ describe("Month", () => {
 
     beforeEach(() => {
       monthComponent = mount(
-        <Month
-          day={utils.newDate("2015-02-01")}
-          selected={utils.newDate("2015-02-01")}
-          preSelection={utils.newDate("2015-05-01")}
-          showQuarterYearPicker
-        />
+        <UtilsContextProvider utils={utils}>
+          <Month
+            day={utils.newDate("2015-02-01")}
+            selected={utils.newDate("2015-02-01")}
+            preSelection={utils.newDate("2015-05-01")}
+            showQuarterYearPicker
+          />
+        </UtilsContextProvider>
       );
       quarter = monthComponent.find(".react-datepicker__quarter-text").at(0);
     });
@@ -429,11 +502,13 @@ describe("Month", () => {
 
     beforeEach(() => {
       const monthComponent = mount(
-        <Month
-          day={utils.newDate("2015-02-01")}
-          selected={utils.newDate("2015-02-01")}
-          showQuarterYearPicker
-        />
+        <UtilsContextProvider utils={utils}>
+          <Month
+            day={utils.newDate("2015-02-01")}
+            selected={utils.newDate("2015-02-01")}
+            showQuarterYearPicker
+          />
+        </UtilsContextProvider>
       );
       quarter = monthComponent.find(".react-datepicker__quarter-text").at(1);
     });
@@ -453,12 +528,14 @@ describe("Month", () => {
 
   it("should return quarter-in-range class if quarter is between the start date and end date", () => {
     const monthComponent = mount(
-      <Month
-        day={utils.newDate("2015-02-01")}
-        startDate={utils.newDate("2015-01-01")}
-        endDate={utils.newDate("2015-08-01")}
-        showQuarterYearPicker
-      />
+      <UtilsContextProvider utils={utils}>
+        <Month
+          day={utils.newDate("2015-02-01")}
+          startDate={utils.newDate("2015-01-01")}
+          endDate={utils.newDate("2015-08-01")}
+          showQuarterYearPicker
+        />
+      </UtilsContextProvider>
     );
     const quarter = monthComponent
       .find(".react-datepicker__quarter-text")
@@ -470,11 +547,13 @@ describe("Month", () => {
 
   it("should render full month name", () => {
     const monthComponent = mount(
-      <Month
-        day={utils.newDate("2015-12-01")}
-        showMonthYearPicker
-        showFullMonthYearPicker
-      />
+      <UtilsContextProvider utils={utils}>
+        <Month
+          day={utils.newDate("2015-12-01")}
+          showMonthYearPicker
+          showFullMonthYearPicker
+        />
+      </UtilsContextProvider>
     );
     const month = monthComponent.find(".react-datepicker__month-1").at(0);
 
@@ -483,7 +562,9 @@ describe("Month", () => {
 
   it("should render short month name", () => {
     const monthComponent = mount(
-      <Month day={utils.newDate("2015-12-01")} showMonthYearPicker />
+      <UtilsContextProvider utils={utils}>
+        <Month day={utils.newDate("2015-12-01")} showMonthYearPicker />
+      </UtilsContextProvider>
     );
     const month = monthComponent.find(".react-datepicker__month-1").at(0);
 
@@ -492,7 +573,11 @@ describe("Month", () => {
 
   describe("Keyboard navigation", () => {
     const renderMonth = (props) =>
-      mount(<Month showMonthYearPicker {...props} />);
+      mount(
+        <UtilsContextProvider utils={utils}>
+          <Month showMonthYearPicker {...props} />
+        </UtilsContextProvider>
+      );
 
     it("should trigger setPreSelection and set March as pre-selected on arrowRight", () => {
       let preSelected = false;

@@ -144,7 +144,10 @@ export function DateUtils(provider) {
   // ** Date Setters **
 
   function setTime(date, { hour = 0, minute = 0, second = 0 }) {
-    return setHours(setMinutes(setSeconds(date, second), minute), hour);
+    return setHours(
+      setMinutes(provider.setSeconds(date, second), minute),
+      hour
+    );
   }
 
   function setMinutes(date, minutes) {
@@ -194,6 +197,10 @@ export function DateUtils(provider) {
 
   // *** Start of ***
 
+  function getStartOfDay(date) {
+    return provider.startOfDay(date);
+  }
+
   function getStartOfWeek(date, locale, calendarStartDay) {
     let localeObj = locale
       ? getLocaleObject(locale)
@@ -207,7 +214,9 @@ export function DateUtils(provider) {
   const getStartOfMonth = provider.startOfMonth;
   const getStartOfYear = provider.startOfYear;
   const getStartOfQuarter = provider.startOfQuarter;
-  const getStartOfToday = provider.startOfDay;
+  function getStartOfToday() {
+    return provider.startOfDay(newDate());
+  }
 
   // *** End of ***
 
@@ -732,11 +741,11 @@ export function DateUtils(provider) {
     getWeek,
     getDayOfWeekCode,
     getStartOfToday,
+    getStartOfDay,
     getStartOfWeek,
     getStartOfMonth,
     getStartOfYear,
     getStartOfQuarter,
-    getStartOfToday,
     getEndOfWeek,
     getEndOfMonth,
     addMinutes,
@@ -794,5 +803,8 @@ export function DateUtils(provider) {
     timesToInjectAfter,
     addZero,
     getYearsPeriod,
+    startOfDay: provider.startOfDay,
+    endOfDay: provider.endOfDay,
+    set: provider.set,
   };
 }

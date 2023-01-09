@@ -55,4 +55,5 @@ export { default as isWithinInterval } from "date-fns/isWithinInterval";
 export { default as toDate } from "date-fns/toDate";
 export { default as parse } from "date-fns/parse";
 export { default as parseISO } from "date-fns/parseISO";
+export { default as set } from "date-fns/set";
 export { default as longFormatters } from "date-fns/esm/_lib/format/longFormatters";

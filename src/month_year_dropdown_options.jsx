@@ -31,8 +31,8 @@ export default class MonthYearDropdownOptions extends React.Component {
     locale: PropTypes.string,
   };
 
-  constructor(props) {
-    super(props);
+  constructor(props, context) {
+    super(props, context);
 
     this.state = {
       monthYearsList: generateMonthYears(

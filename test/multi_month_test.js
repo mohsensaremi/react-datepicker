@@ -1,23 +1,29 @@
+import { shallow } from "enzyme";
 import React from "react";
+import { withContext } from "shallow-with-context";
+import * as dateFnsProvider from "../provider/date-fns";
 import Calendar from "../src/calendar";
+import { DateUtils } from "../src/date_utils";
 import Month from "../src/month";
 import YearDropdown from "../src/year_dropdown";
-import * as utils from "../src/date_utils";
-import { shallow } from "enzyme";
 
 describe("Multi month calendar", function () {
+  const utils = DateUtils(dateFnsProvider);
+  const ComponentWithContext = withContext(Calendar, utils);
+
   var dateFormat = "LLLL yyyy";
 
   function getCalendar(extraProps) {
     return shallow(
-      <Calendar
+      <ComponentWithContext
         dateFormat={dateFormat}
         onSelect={() => {}}
         onClickOutside={() => {}}
         hideCalendar={() => {}}
         dropdownMode="scroll"
         {...extraProps}
-      />
+      />,
+      { context: utils }
     );
   }
 

@@ -2,8 +2,12 @@ import React from "react";
 import { mount } from "enzyme";
 import DatePicker from "../src/index.jsx";
 import TimeComponent from "../src/time";
+import * as dateFnsProvider from "../provider/date-fns";
+import { UtilsContextProvider } from "../src/context";
+import { DateUtils } from "../src/date_utils";
 
 describe("DatePicker", () => {
+  const utils = DateUtils(dateFnsProvider);
   let sandbox;
 
   beforeEach(() => {
@@ -15,13 +19,21 @@ describe("DatePicker", () => {
   });
 
   it("should show time component when showTimeSelect prop is present", () => {
-    var datePicker = mount(<DatePicker showTimeSelect />);
+    var datePicker = mount(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker showTimeSelect />
+      </UtilsContextProvider>
+    );
     var timeComponent = datePicker.find(TimeComponent);
     expect(timeComponent).to.exist;
   });
 
   it("should have custom time caption", () => {
-    const timeComponent = mount(<TimeComponent timeCaption="Custom time" />);
+    const timeComponent = mount(
+      <UtilsContextProvider utils={utils}>
+        <TimeComponent timeCaption="Custom time" />
+      </UtilsContextProvider>
+    );
 
     const caption = timeComponent.find(".react-datepicker-time__header");
     expect(caption.text()).to.equal("Custom time");
@@ -31,7 +43,9 @@ describe("DatePicker", () => {
     let datePicker;
     before(() => {
       datePicker = mount(
-        <DatePicker showTimeSelect showTimeSelectOnly todayButton="Today" />
+        <UtilsContextProvider utils={utils}>
+          <DatePicker showTimeSelect showTimeSelectOnly todayButton="Today" />
+        </UtilsContextProvider>
       );
       datePicker.find("input").simulate("click");
     });

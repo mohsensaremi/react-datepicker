@@ -4,6 +4,5 @@ import "../src/stylesheets/datepicker.scss";
 
 Enzyme.configure({ adapter: new Adapter() });
 
-require("./date_utils_test");
-// const context = require.context(".", true, /_test$/);
-// context.keys().forEach(context);
+const context = require.context(".", true, /_test$/);
+context.keys().forEach(context);

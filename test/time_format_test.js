@@ -1,10 +1,13 @@
-import React from "react";
-import { mount } from "enzyme";
-import TimeComponent from "../src/time";
-import * as utils from "../src/date_utils";
 import ptBR from "date-fns/locale/pt-BR";
+import { mount } from "enzyme";
+import React from "react";
+import * as dateFnsProvider from "../provider/date-fns";
+import { UtilsContextProvider } from "../src/context";
+import { DateUtils } from "../src/date_utils";
+import TimeComponent from "../src/time";
 
 describe("TimeComponent", () => {
+  const utils = DateUtils(dateFnsProvider);
   utils.registerLocale("pt-BR", ptBR);
 
   let sandbox;
@@ -29,7 +32,11 @@ describe("TimeComponent", () => {
     });
 
     it("should forward the time format provided in timeFormat props", () => {
-      var timeComponent = mount(<TimeComponent format="HH:mm" />);
+      var timeComponent = mount(
+        <UtilsContextProvider utils={utils}>
+          <TimeComponent format="HH:mm" />
+        </UtilsContextProvider>
+      );
 
       var timeListItem = timeComponent.find(
         ".react-datepicker__time-list-item"
@@ -38,12 +45,20 @@ describe("TimeComponent", () => {
     });
 
     it("should format the time based on the default locale (en-US)", () => {
-      mount(<TimeComponent format="p" />);
+      mount(
+        <UtilsContextProvider utils={utils}>
+          <TimeComponent format="p" />
+        </UtilsContextProvider>
+      );
       expect(spy.args[0][1].innerHTML).to.eq("1:00 PM");
     });
 
     it("should format the time based on the pt-BR locale", () => {
-      mount(<TimeComponent format="p" locale="pt-BR" />);
+      mount(
+        <UtilsContextProvider utils={utils}>
+          <TimeComponent format="p" locale="pt-BR" />
+        </UtilsContextProvider>
+      );
       expect(spy.args[0][1].innerHTML).to.eq("13:00");
     });
   });
@@ -55,38 +70,54 @@ describe("TimeComponent", () => {
     });
 
     it("should call calcCenterPosition once", () => {
-      mount(<TimeComponent format="HH:mm" />);
+      mount(
+        <UtilsContextProvider utils={utils}>
+          <TimeComponent format="HH:mm" />
+        </UtilsContextProvider>
+      );
       expect(spy.calledOnce).to.eq(true);
     });
 
     it("should call calcCenterPosition with centerLi ref, closest to the current time", () => {
-      mount(<TimeComponent format="HH:mm" />);
+      mount(
+        <UtilsContextProvider utils={utils}>
+          <TimeComponent format="HH:mm" />
+        </UtilsContextProvider>
+      );
       expect(spy.args[0][1].innerHTML).to.eq("13:00");
     });
 
     it("with five minute time interval, should call calcCenterPosition with centerLi ref, closest to the current time", () => {
-      mount(<TimeComponent format="HH:mm" intervals={5} />);
+      mount(
+        <UtilsContextProvider utils={utils}>
+          <TimeComponent format="HH:mm" intervals={5} />
+        </UtilsContextProvider>
+      );
       expect(spy.args[0][1].innerHTML).to.eq("13:25");
     });
 
     it("should call calcCenterPosition with centerLi ref, closest to the selected time", () => {
       mount(
-        <TimeComponent
-          format="HH:mm"
-          selected={new Date("1990-06-14 08:11")}
-          openToDate={new Date("1990-06-14 09:11")}
-        />
+        <UtilsContextProvider utils={utils}>
+          <TimeComponent
+            format="HH:mm"
+            selected={new Date("1990-06-14 08:11")}
+            openToDate={new Date("1990-06-14 09:11")}
+          />
+        </UtilsContextProvider>
       );
       expect(spy.args[0][1].innerHTML).to.eq("08:00");
     });
 
     it("should call calcCenterPosition with centerLi ref, which is selected", () => {
       mount(
-        <TimeComponent
-          format="HH:mm"
-          selected={new Date("1990-06-14 08:00")}
-          openToDate={new Date("1990-06-14 09:00")}
-        />
+        <UtilsContextProvider utils={utils}>
+          <TimeComponent
+            format="HH:mm"
+            selected={new Date("1990-06-14 08:00")}
+            openToDate={new Date("1990-06-14 09:00")}
+          />
+        </UtilsContextProvider>
       );
       expect(
         spy.args[0][1].classList.contains(
@@ -97,11 +128,13 @@ describe("TimeComponent", () => {
 
     it("should add the aria-selected property to the selected item", () => {
       var timeComponent = mount(
-        <TimeComponent
-          format="HH:mm"
-          selected={new Date("1990-06-14 08:00")}
-          openToDate={new Date("1990-06-14 09:00")}
-        />
+        <UtilsContextProvider utils={utils}>
+          <TimeComponent
+            format="HH:mm"
+            selected={new Date("1990-06-14 08:00")}
+            openToDate={new Date("1990-06-14 09:00")}
+          />
+        </UtilsContextProvider>
       );
 
       var timeListItem = timeComponent.find(
@@ -112,11 +145,13 @@ describe("TimeComponent", () => {
 
     it("should not add the aria-selected property to a regular item", () => {
       var timeComponent = mount(
-        <TimeComponent
-          format="HH:mm"
-          selected={new Date("1990-06-14 08:00")}
-          openToDate={new Date("1990-06-14 09:00")}
-        />
+        <UtilsContextProvider utils={utils}>
+          <TimeComponent
+            format="HH:mm"
+            selected={new Date("1990-06-14 08:00")}
+            openToDate={new Date("1990-06-14 09:00")}
+          />
+        </UtilsContextProvider>
       );
 
       var timeListItem = timeComponent.find(
@@ -127,20 +162,24 @@ describe("TimeComponent", () => {
 
     it("when no selected time, should call calcCenterPosition with centerLi ref, closest to the opened time", () => {
       mount(
-        <TimeComponent
-          format="HH:mm"
-          openToDate={new Date("1990-06-14 09:11")}
-        />
+        <UtilsContextProvider utils={utils}>
+          <TimeComponent
+            format="HH:mm"
+            openToDate={new Date("1990-06-14 09:11")}
+          />
+        </UtilsContextProvider>
       );
       expect(spy.args[0][1].innerHTML).to.eq("09:00");
     });
 
     it("when no selected time, should call calcCenterPosition with centerLi ref, and no time should be selected", () => {
       mount(
-        <TimeComponent
-          format="HH:mm"
-          openToDate={new Date("1990-06-14 09:00")}
-        />
+        <UtilsContextProvider utils={utils}>
+          <TimeComponent
+            format="HH:mm"
+            openToDate={new Date("1990-06-14 09:00")}
+          />
+        </UtilsContextProvider>
       );
       expect(
         spy.args[0][1].classList.contains(

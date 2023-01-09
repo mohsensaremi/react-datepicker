@@ -170,8 +170,8 @@ export default class Calendar extends React.Component {
     setPreSelection: PropTypes.func,
   };
 
-  constructor(props) {
-    super(props);
+  constructor(props, context) {
+    super(props, context);
 
     this.containerRef = React.createRef();
 
@@ -237,6 +237,7 @@ export default class Calendar extends React.Component {
       getEffectiveMinDate,
       getEffectiveMaxDate,
     } = this.context;
+
     const { preSelection, selected, openToDate } = this.props;
     const minDate = getEffectiveMinDate(this.props);
     const maxDate = getEffectiveMaxDate(this.props);

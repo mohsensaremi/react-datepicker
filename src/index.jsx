@@ -10,6 +10,7 @@ import Portal from "./portal";
 import TabLoop from "./tab_loop";
 
 export { default as CalendarContainer } from "./calendar_container";
+export * from "./context";
 
 const outsideClickIgnoreClass = "react-datepicker-ignore-onclickoutside";
 const WrappedCalendar = onClickOutside(Calendar);
@@ -255,8 +256,8 @@ export default class DatePicker extends React.Component {
     monthAriaLabelPrefix: PropTypes.string,
   };
 
-  constructor(props) {
-    super(props);
+  constructor(props, context) {
+    super(props, context);
     this.state = this.calcInitialState();
   }
 

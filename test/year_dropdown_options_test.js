@@ -1,10 +1,13 @@
 import React from "react";
 import YearDropdownOptions from "../src/year_dropdown_options.jsx";
 import { mount, shallow } from "enzyme";
-import * as utils from "../src/date_utils";
+import * as dateFnsProvider from "../provider/date-fns";
+import { UtilsContextProvider } from "../src/context";
+import { DateUtils } from "../src/date_utils";
+const utils = DateUtils(dateFnsProvider);
 
 describe("YearDropdownOptions", () => {
-  let yearDropdown, handleChangeResult;
+  let yearDropdownWrapper, yearDropdown, handleChangeResult;
   const mockHandleChange = function (changeInput) {
     handleChangeResult = changeInput;
   };
@@ -13,13 +16,16 @@ describe("YearDropdownOptions", () => {
   beforeEach(() => {
     sandbox = sinon.createSandbox();
     onCancelSpy = sandbox.spy();
-    yearDropdown = mount(
-      <YearDropdownOptions
-        year={2015}
-        onChange={mockHandleChange}
-        onCancel={onCancelSpy}
-      />
+    yearDropdownWrapper = mount(
+      <UtilsContextProvider utils={utils}>
+        <YearDropdownOptions
+          year={2015}
+          onChange={mockHandleChange}
+          onCancel={onCancelSpy}
+        />
+      </UtilsContextProvider>
     );
+    yearDropdown = yearDropdownWrapper.find(YearDropdownOptions);
   });
 
   afterEach(() => {
@@ -55,11 +61,11 @@ describe("YearDropdownOptions", () => {
   });
 
   it("increments the available years when the 'upcoming years' button is clicked", () => {
-    yearDropdown
+    yearDropdownWrapper
       .find(".react-datepicker__navigation--years-upcoming")
       .simulate("click");
 
-    const textContents = yearDropdown
+    const textContents = yearDropdownWrapper
       .find(".react-datepicker__year-option")
       .map((node) => node.text());
 
@@ -81,11 +87,11 @@ describe("YearDropdownOptions", () => {
   });
 
   it("decrements the available years when the 'previous years' button is clicked", () => {
-    yearDropdown
+    yearDropdownWrapper
       .find(".react-datepicker__navigation--years-previous")
       .simulate("click");
 
-    const textContents = yearDropdown
+    const textContents = yearDropdownWrapper
       .find(".react-datepicker__year-option")
       .map((node) => node.text());
 
@@ -178,14 +184,16 @@ describe("YearDropdownOptions with scrollable dropwdown", () => {
   it("should show upcoming and previous links and generate 10 years if prop scrollableYearDropdown is true", () => {
     const onCancelSpy = sandbox.spy();
     const onChangeSpy = sandbox.spy();
-    const yearDropdown = shallow(
-      <YearDropdownOptions
-        onCancel={onCancelSpy}
-        onChange={onChangeSpy}
-        scrollableYearDropdown
-        year={2015}
-      />
-    );
+    const yearDropdown = mount(
+      <UtilsContextProvider utils={utils}>
+        <YearDropdownOptions
+          onCancel={onCancelSpy}
+          onChange={onChangeSpy}
+          scrollableYearDropdown
+          year={2015}
+        />
+      </UtilsContextProvider>
+    ).find(YearDropdownOptions);
     expect(yearDropdown.state().yearsList.length).to.equal(21);
     expect(
       yearDropdown.find(".react-datepicker__navigation--years-upcoming").length
@@ -200,16 +208,18 @@ describe("YearDropdownOptions with scrollable dropwdown", () => {
     const onChangeSpy = sandbox.spy();
     const minDate = utils.newDate();
     const maxDate = utils.addYears(utils.newDate(), 1);
-    const yearDropdown = shallow(
-      <YearDropdownOptions
-        onCancel={onCancelSpy}
-        onChange={onChangeSpy}
-        scrollableYearDropdown
-        year={utils.getYear(utils.newDate())}
-        minDate={minDate}
-        maxDate={maxDate}
-      />
-    );
+    const yearDropdown = mount(
+      <UtilsContextProvider utils={utils}>
+        <YearDropdownOptions
+          onCancel={onCancelSpy}
+          onChange={onChangeSpy}
+          scrollableYearDropdown
+          year={utils.getYear(utils.newDate())}
+          minDate={minDate}
+          maxDate={maxDate}
+        />
+      </UtilsContextProvider>
+    ).find(YearDropdownOptions);
     expect(yearDropdown.state().yearsList.length).to.equal(2);
     expect(yearDropdown.state().yearsList).to.contain(utils.getYear(minDate));
     expect(yearDropdown.state().yearsList).to.contain(utils.getYear(maxDate));
@@ -221,14 +231,16 @@ describe("YearDropdownOptions with scrollable dropwdown", () => {
     const minDate = utils.newDate();
     const maxDate = utils.addYears(utils.newDate(), 1);
     const yearDropdown = mount(
-      <YearDropdownOptions
-        onCancel={onCancelSpy}
-        onChange={onChangeSpy}
-        scrollableYearDropdown
-        year={utils.getYear(utils.newDate())}
-        minDate={minDate}
-        maxDate={maxDate}
-      />
+      <UtilsContextProvider utils={utils}>
+        <YearDropdownOptions
+          onCancel={onCancelSpy}
+          onChange={onChangeSpy}
+          scrollableYearDropdown
+          year={utils.getYear(utils.newDate())}
+          minDate={minDate}
+          maxDate={maxDate}
+        />
+      </UtilsContextProvider>
     );
 
     expect(
@@ -245,14 +257,16 @@ describe("YearDropdownOptions with scrollable dropwdown", () => {
     const minDate = utils.subYears(utils.newDate(), 11);
     const maxDate = utils.addYears(utils.newDate(), 11);
     const yearDropdown = mount(
-      <YearDropdownOptions
-        onCancel={onCancelSpy}
-        onChange={onChangeSpy}
-        scrollableYearDropdown
-        year={utils.getYear(utils.newDate())}
-        minDate={minDate}
-        maxDate={maxDate}
-      />
+      <UtilsContextProvider utils={utils}>
+        <YearDropdownOptions
+          onCancel={onCancelSpy}
+          onChange={onChangeSpy}
+          scrollableYearDropdown
+          year={utils.getYear(utils.newDate())}
+          minDate={minDate}
+          maxDate={maxDate}
+        />
+      </UtilsContextProvider>
     );
 
     expect(
@@ -307,13 +321,15 @@ describe("YearDropdownOptions with scrollable dropwdown", () => {
     const onChangeSpy = sandbox.spy();
     const minDate = utils.subYears(utils.newDate(), 11);
     const yearDropdown = mount(
-      <YearDropdownOptions
-        onCancel={onCancelSpy}
-        onChange={onChangeSpy}
-        scrollableYearDropdown
-        year={utils.getYear(utils.newDate())}
-        minDate={minDate}
-      />
+      <UtilsContextProvider utils={utils}>
+        <YearDropdownOptions
+          onCancel={onCancelSpy}
+          onChange={onChangeSpy}
+          scrollableYearDropdown
+          year={utils.getYear(utils.newDate())}
+          minDate={minDate}
+        />
+      </UtilsContextProvider>
     );
 
     expect(
@@ -352,13 +368,15 @@ describe("YearDropdownOptions with scrollable dropwdown", () => {
     const onChangeSpy = sandbox.spy();
     const maxDate = utils.addYears(utils.newDate(), 11);
     const yearDropdown = mount(
-      <YearDropdownOptions
-        onCancel={onCancelSpy}
-        onChange={onChangeSpy}
-        scrollableYearDropdown
-        year={utils.getYear(utils.newDate())}
-        maxDate={maxDate}
-      />
+      <UtilsContextProvider utils={utils}>
+        <YearDropdownOptions
+          onCancel={onCancelSpy}
+          onChange={onChangeSpy}
+          scrollableYearDropdown
+          year={utils.getYear(utils.newDate())}
+          maxDate={maxDate}
+        />
+      </UtilsContextProvider>
     );
 
     expect(
@@ -396,15 +414,17 @@ describe("YearDropdownOptions with scrollable dropwdown", () => {
   it("should generate 25 years (25 above, 25 below selected) if prop yearDropdownItemNumber is set to 25", () => {
     const onCancelSpy = sandbox.spy();
     const onChangeSpy = sandbox.spy();
-    const yearDropdown = shallow(
-      <YearDropdownOptions
-        onCancel={onCancelSpy}
-        onChange={onChangeSpy}
-        scrollableYearDropdown
-        year={2015}
-        yearDropdownItemNumber={25}
-      />
-    );
+    const yearDropdown = mount(
+      <UtilsContextProvider utils={utils}>
+        <YearDropdownOptions
+          onCancel={onCancelSpy}
+          onChange={onChangeSpy}
+          scrollableYearDropdown
+          year={2015}
+          yearDropdownItemNumber={25}
+        />
+      </UtilsContextProvider>
+    ).find(YearDropdownOptions);
     expect(yearDropdown.state().yearsList.length).to.equal(51);
   });
 
@@ -412,14 +432,18 @@ describe("YearDropdownOptions with scrollable dropwdown", () => {
     const onCancelSpy = sandbox.spy();
     const onChangeSpy = sandbox.spy();
     const yearDropdownInstance = mount(
-      <YearDropdownOptions
-        onCancel={onCancelSpy}
-        onChange={onChangeSpy}
-        scrollableYearDropdown
-        year={2015}
-        yearDropdownItemNumber={25}
-      />
-    ).instance();
+      <UtilsContextProvider utils={utils}>
+        <YearDropdownOptions
+          onCancel={onCancelSpy}
+          onChange={onChangeSpy}
+          scrollableYearDropdown
+          year={2015}
+          yearDropdownItemNumber={25}
+        />
+      </UtilsContextProvider>
+    )
+      .find(YearDropdownOptions)
+      .instance();
 
     yearDropdownInstance.dropdownRef.current = {
       scrollHeight: 800,

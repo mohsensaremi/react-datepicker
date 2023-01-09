@@ -1,10 +1,12 @@
-import React from "react";
 import { mount } from "enzyme";
-import { getHours } from "../src/date_utils";
-import DatePicker from "../src/index.jsx";
+import React from "react";
+import * as dateFnsProvider from "../provider/date-fns";
+import { UtilsContextProvider } from "../src/context";
+import { DateUtils } from "../src/date_utils";
 import TimeComponent from "../src/time";
 
 describe("TimeComponent", () => {
+  const utils = DateUtils(dateFnsProvider);
   let sandbox;
 
   beforeEach(() => {
@@ -17,7 +19,9 @@ describe("TimeComponent", () => {
 
   it("should disable times matched by filterTime prop", () => {
     const timeComponent = mount(
-      <TimeComponent filterTime={(time) => getHours(time) !== 17} />
+      <UtilsContextProvider utils={utils}>
+        <TimeComponent filterTime={(time) => utils.getHours(time) !== 17} />
+      </UtilsContextProvider>
     );
 
     expect(

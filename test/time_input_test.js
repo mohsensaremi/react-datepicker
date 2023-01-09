@@ -1,12 +1,16 @@
-import React from "react";
-import defer from "lodash/defer";
 import { mount, shallow } from "enzyme";
+import defer from "lodash/defer";
+import React from "react";
+import * as dateFnsProvider from "../provider/date-fns";
+import { UtilsContextProvider } from "../src/context";
+import { DateUtils } from "../src/date_utils";
 import DatePicker from "../src/index.jsx";
 import InputTimeComponent from "../src/inputTime";
 import CustomTimeInput from "./helper_components/custom_time_input";
-import { newDate } from "../src/date_utils.js";
 
 describe("timeInput", () => {
+  const utils = DateUtils(dateFnsProvider);
+
   let sandbox;
 
   beforeEach(() => {
@@ -18,7 +22,11 @@ describe("timeInput", () => {
   });
 
   it("should show time component when showTimeSelect prop is present", () => {
-    const datePicker = mount(<DatePicker showTimeInput />);
+    const datePicker = mount(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker showTimeInput />
+      </UtilsContextProvider>
+    );
     const component = datePicker.find(InputTimeComponent);
     expect(component).to.exist;
   });

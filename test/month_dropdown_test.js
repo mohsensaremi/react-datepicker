@@ -3,12 +3,17 @@ import range from "lodash/range";
 import MonthDropdown from "../src/month_dropdown.jsx";
 import MonthDropdownOptions from "../src/month_dropdown_options.jsx";
 import { mount } from "enzyme";
-import { newDate, getMonthInLocale, registerLocale } from "../src/date_utils";
 import zh_cn from "date-fns/locale/zh-CN";
 import el from "date-fns/locale/el";
 import ru from "date-fns/locale/ru";
+import * as dateFnsProvider from "../provider/date-fns";
+import { UtilsContextProvider } from "../src/context";
+import { DateUtils } from "../src/date_utils";
 
 describe("MonthDropdown", () => {
+  const utils = DateUtils(dateFnsProvider);
+  const { getMonthInLocale, registerLocale } = utils;
+
   let monthDropdown;
   let handleChangeResult;
   const mockHandleChange = function (changeInput) {
@@ -18,12 +23,14 @@ describe("MonthDropdown", () => {
 
   function getMonthDropdown(overrideProps) {
     return mount(
-      <MonthDropdown
-        dropdownMode="scroll"
-        month={11}
-        onChange={mockHandleChange}
-        {...overrideProps}
-      />
+      <UtilsContextProvider utils={utils}>
+        <MonthDropdown
+          dropdownMode="scroll"
+          month={11}
+          onChange={mockHandleChange}
+          {...overrideProps}
+        />
+      </UtilsContextProvider>
     );
   }
 
@@ -112,13 +119,18 @@ describe("MonthDropdown", () => {
       const monthNames = range(0, 12).map((M) => getMonthInLocale(M));
       const onCancelSpy = sandbox.spy();
       const monthDropdownOptionsInstance = mount(
-        <MonthDropdownOptions
-          onCancel={onCancelSpy}
-          onChange={sandbox.spy()}
-          month={11}
-          monthNames={monthNames}
-        />
-      ).instance();
+        <UtilsContextProvider utils={utils}>
+          <MonthDropdownOptions
+            onCancel={onCancelSpy}
+            onChange={sandbox.spy()}
+            month={11}
+            monthNames={monthNames}
+          />
+        </UtilsContextProvider>
+      )
+        .find(MonthDropdownOptions)
+        .first()
+        .instance();
       monthDropdownOptionsInstance.handleClickOutside();
       expect(onCancelSpy.calledOnce).to.be.true;
     });

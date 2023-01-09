@@ -1,18 +1,19 @@
+import { enGB, enUS } from "date-fns/locale";
+import { mount } from "enzyme";
+import defer from "lodash/defer";
 import React from "react";
 import ReactDOM from "react-dom";
 import TestUtils from "react-dom/test-utils";
-import { enUS, enGB } from "date-fns/locale";
-import { mount } from "enzyme";
-import defer from "lodash/defer";
-import DatePicker, { registerLocale } from "../src/index.jsx";
+import * as dateFnsProvider from "../provider/date-fns";
+import { UtilsContextProvider } from "../src/context";
+import { DateUtils } from "../src/date_utils";
 import Day from "../src/day";
-import WeekNumber from "../src/week_number";
-import TestWrapper from "./test_wrapper.jsx";
-import PopperComponent from "../src/popper_component.jsx";
-import CustomInput from "./helper_components/custom_input.jsx";
-import * as utils from "../src/date_utils";
-import { util } from "chai";
+import DatePicker from "../src/index.jsx";
 import Month from "../src/month.jsx";
+import PopperComponent from "../src/popper_component.jsx";
+import WeekNumber from "../src/week_number";
+import CustomInput from "./helper_components/custom_input.jsx";
+import TestWrapper from "./test_wrapper.jsx";
 
 function getKey(key) {
   switch (key) {
@@ -56,6 +57,8 @@ function getSelectedDayNode(datePicker) {
 }
 
 describe("DatePicker", () => {
+  const utils = DateUtils(dateFnsProvider);
+
   let sandbox;
 
   beforeEach(() => {
@@ -67,46 +70,73 @@ describe("DatePicker", () => {
   });
 
   it("should show the calendar when focusing on the date input", () => {
-    var datePicker = TestUtils.renderIntoDocument(<DatePicker />);
+    var wrapper = TestUtils.renderIntoDocument(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker />
+      </UtilsContextProvider>
+    );
+    const datePicker = wrapper.children;
+
     var dateInput = datePicker.input;
     TestUtils.Simulate.focus(ReactDOM.findDOMNode(dateInput));
     expect(datePicker.calendar).to.exist;
   });
 
   it("should allow the user to supply a wrapper component for the popper", () => {
-    var datePicker = mount(<DatePicker popperContainer={TestWrapper} />);
+    var wrapper = mount(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker popperContainer={TestWrapper} />
+      </UtilsContextProvider>
+    );
+    const datePicker = wrapper.find(DatePicker).first();
 
     const dateInput = datePicker.instance().input;
     TestUtils.Simulate.focus(ReactDOM.findDOMNode(dateInput));
 
-    expect(datePicker.find(".test-wrapper").length).to.equal(1);
+    expect(wrapper.find(".test-wrapper").length).to.equal(1);
     expect(datePicker.instance().calendar).to.exist;
   });
 
   it("should allow the user to pass a wrapper component for the calendar", () => {
-    var datePicker = mount(<DatePicker calendarContainer={TestWrapper} />);
+    var wrapper = mount(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker calendarContainer={TestWrapper} />
+      </UtilsContextProvider>
+    );
+    const datePicker = wrapper.find(DatePicker).first();
 
     let dateInput = datePicker.instance().input;
     TestUtils.Simulate.focus(ReactDOM.findDOMNode(dateInput));
 
     datePicker.update();
-    expect(datePicker.find(".test-wrapper").length).to.equal(1);
+    expect(wrapper.find(".test-wrapper").length).to.equal(1);
     expect(datePicker.instance().calendar).to.exist;
   });
 
   it("should pass a custom class to the popper container", () => {
-    var datePicker = mount(<DatePicker popperClassName="some-class-name" />);
+    var wrapper = mount(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker popperClassName="some-class-name" />
+      </UtilsContextProvider>
+    );
+    const datePicker = wrapper.find(DatePicker).first();
+
     var dateInput = datePicker.instance().input;
     TestUtils.Simulate.focus(ReactDOM.findDOMNode(dateInput));
 
     datePicker.update();
-    const popper = datePicker.find(".react-datepicker-popper");
+    const popper = wrapper.find(".react-datepicker-popper");
     expect(popper.length).to.equal(1);
     expect(popper.hasClass("some-class-name")).to.equal(true);
   });
 
   it("should show the calendar when clicking on the date input", () => {
-    var datePicker = TestUtils.renderIntoDocument(<DatePicker />);
+    var wrapper = TestUtils.renderIntoDocument(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker />
+      </UtilsContextProvider>
+    );
+    const datePicker = wrapper.children;
     var dateInput = datePicker.input;
     TestUtils.Simulate.click(ReactDOM.findDOMNode(dateInput));
     expect(datePicker.calendar).to.exist;
@@ -117,10 +147,13 @@ describe("DatePicker", () => {
     var shadow = root.attachShadow({ mode: "closed" });
     var appHost = document.createElement("div");
     shadow.appendChild(appHost);
-    var datePicker = ReactDOM.render(
-      <DatePicker portalId="test-portal" portalHost={shadow} />,
+    var wrapper = ReactDOM.render(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker portalId="test-portal" portalHost={shadow} />
+      </UtilsContextProvider>,
       appHost
     );
+    const datePicker = wrapper.children;
     var dateInput = datePicker.input;
     TestUtils.Simulate.click(ReactDOM.findDOMNode(dateInput));
     expect(datePicker.calendar).to.exist;
@@ -128,7 +161,12 @@ describe("DatePicker", () => {
   });
 
   it("should not set open state when it is disabled and gets clicked", function () {
-    var datePicker = TestUtils.renderIntoDocument(<DatePicker disabled />);
+    var wrapper = TestUtils.renderIntoDocument(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker disabled />
+      </UtilsContextProvider>
+    );
+    const datePicker = wrapper.children;
     var dateInput = datePicker.input;
     TestUtils.Simulate.click(ReactDOM.findDOMNode(dateInput));
     expect(datePicker.state.open).to.be.false;
@@ -139,7 +177,13 @@ describe("DatePicker", () => {
     // Date Picker Dialog | Escape | Closes the dialog and returns focus to the Choose Date button.
     var div = document.createElement("div");
     document.body.appendChild(div);
-    var datePicker = ReactDOM.render(<DatePicker />, div);
+    var wrapper = ReactDOM.render(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker />
+      </UtilsContextProvider>,
+      div
+    );
+    const datePicker = wrapper.children;
 
     // user focuses the input field, the calendar opens
     var dateInput = div.querySelector("input");
@@ -162,20 +206,23 @@ describe("DatePicker", () => {
 
   it("should not re-focus the date input when focusing the year dropdown", (done) => {
     const onBlurSpy = sandbox.spy();
-    const datePicker = mount(
-      <DatePicker
-        showMonthDropdown
-        showYearDropdown
-        dropdownMode="select"
-        onBlur={onBlurSpy}
-      />
+    const wrapper = mount(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker
+          showMonthDropdown
+          showYearDropdown
+          dropdownMode="select"
+          onBlur={onBlurSpy}
+        />
+      </UtilsContextProvider>
     );
+    const datePicker = wrapper.find(DatePicker).first();
     const dateInput = datePicker.instance().input;
-    const dateInputWrapper = datePicker.find("input");
+    const dateInputWrapper = wrapper.find("input");
     const focusSpy = sandbox.spy(dateInput, "focus");
 
     dateInputWrapper.simulate("focus");
-    const calendarWrapper = datePicker.find("Calendar");
+    const calendarWrapper = wrapper.find("Calendar");
     const yearSelect = calendarWrapper.find(".react-datepicker__year-select");
     dateInputWrapper.simulate("blur");
     yearSelect.simulate("focus");
@@ -189,17 +236,20 @@ describe("DatePicker", () => {
 
   it("should fire onYearChange when the year is selected", (done) => {
     const onYearChangeSpy = sinon.spy();
-    const datePicker = mount(
-      <DatePicker
-        showYearDropdown
-        dropdownMode="select"
-        onYearChange={onYearChangeSpy}
-      />
+    const wrapper = mount(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker
+          showYearDropdown
+          dropdownMode="select"
+          onYearChange={onYearChangeSpy}
+        />
+      </UtilsContextProvider>
     );
-    const dateInputWrapper = datePicker.find("input");
+    const datePicker = wrapper.find(DatePicker).first();
+    const dateInputWrapper = wrapper.find("input");
 
     dateInputWrapper.simulate("click");
-    const calendarWrapper = datePicker.find("Calendar");
+    const calendarWrapper = wrapper.find("Calendar");
     const yearSelect = calendarWrapper.find(".react-datepicker__year-select");
     yearSelect.simulate("change");
 
@@ -210,7 +260,12 @@ describe("DatePicker", () => {
   });
 
   it("should keep the calendar shown when clicking the calendar", () => {
-    var datePicker = TestUtils.renderIntoDocument(<DatePicker />);
+    var wrapper = TestUtils.renderIntoDocument(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker />
+      </UtilsContextProvider>
+    );
+    const datePicker = wrapper.children;
     var dateInput = datePicker.input;
     TestUtils.Simulate.focus(ReactDOM.findDOMNode(dateInput));
     TestUtils.Simulate.click(ReactDOM.findDOMNode(datePicker.calendar));
@@ -218,21 +273,36 @@ describe("DatePicker", () => {
   });
 
   it("should not set open state when it is disabled and gets clicked", function () {
-    var datePicker = TestUtils.renderIntoDocument(<DatePicker disabled />);
+    var wrapper = TestUtils.renderIntoDocument(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker disabled />
+      </UtilsContextProvider>
+    );
+    const datePicker = wrapper.children;
     var dateInput = datePicker.input;
     TestUtils.Simulate.click(ReactDOM.findDOMNode(dateInput));
     expect(datePicker.state.open).to.be.false;
   });
 
   it("should not set open state when it is readOnly and gets clicked", function () {
-    var datePicker = TestUtils.renderIntoDocument(<DatePicker readOnly />);
+    var wrapper = TestUtils.renderIntoDocument(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker readOnly />
+      </UtilsContextProvider>
+    );
+    const datePicker = wrapper.children;
     var dateInput = datePicker.input;
     TestUtils.Simulate.click(ReactDOM.findDOMNode(dateInput));
     expect(datePicker.state.open).to.be.false;
   });
 
   it("should hide the calendar when clicking a day on the calendar", () => {
-    var datePicker = TestUtils.renderIntoDocument(<DatePicker />);
+    var wrapper = TestUtils.renderIntoDocument(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker />
+      </UtilsContextProvider>
+    );
+    const datePicker = wrapper.children;
     var dateInput = datePicker.input;
     TestUtils.Simulate.focus(ReactDOM.findDOMNode(dateInput));
     var day = TestUtils.scryRenderedComponentsWithType(
@@ -244,9 +314,12 @@ describe("DatePicker", () => {
   });
 
   it("should not hide the calendar when clicking a day on the calendar and shouldCloseOnSelect prop is false", () => {
-    var datePicker = TestUtils.renderIntoDocument(
-      <DatePicker shouldCloseOnSelect={false} />
+    var wrapper = TestUtils.renderIntoDocument(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker shouldCloseOnSelect={false} />
+      </UtilsContextProvider>
     );
+    const datePicker = wrapper.children;
     var dateInput = datePicker.input;
     TestUtils.Simulate.focus(ReactDOM.findDOMNode(dateInput));
     var day = TestUtils.scryRenderedComponentsWithType(
@@ -258,9 +331,12 @@ describe("DatePicker", () => {
   });
 
   it("should set open to true if showTimeInput is true", () => {
-    var datePicker = TestUtils.renderIntoDocument(
-      <DatePicker shouldCloseOnSelect={false} showTimeInput />
+    var wrapper = TestUtils.renderIntoDocument(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker shouldCloseOnSelect={false} showTimeInput />
+      </UtilsContextProvider>
     );
+    const datePicker = wrapper.children;
     var handleTimeChange = datePicker.handleTimeChange;
     handleTimeChange("13:00");
     expect(datePicker.state.open).to.be.true;
@@ -320,16 +396,19 @@ describe("DatePicker", () => {
   });
 
   it("should update the preSelection state when Today button is clicked after selecting a different day for inline mode", () => {
-    var datePicker = TestUtils.renderIntoDocument(
-      <DatePicker
-        todayButton="Today"
-        selected={utils.newDate()}
-        inline
-        onChange={(d) => {
-          var date = d;
-        }}
-      />
+    var wrapper = TestUtils.renderIntoDocument(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker
+          todayButton="Today"
+          selected={utils.newDate()}
+          inline
+          onChange={(d) => {
+            var date = d;
+          }}
+        />
+      </UtilsContextProvider>
     );
+    const datePicker = wrapper.children;
 
     var today = getSelectedDayNode(datePicker);
     var anyOtherDay = today.nextElementSibling || today.previousElementSibling;
@@ -346,7 +425,12 @@ describe("DatePicker", () => {
   });
 
   it("should hide the calendar when pressing enter in the date input", () => {
-    var datePicker = TestUtils.renderIntoDocument(<DatePicker />);
+    var wrapper = TestUtils.renderIntoDocument(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker />
+      </UtilsContextProvider>
+    );
+    const datePicker = wrapper.children;
     var dateInput = datePicker.input;
     TestUtils.Simulate.focus(ReactDOM.findDOMNode(dateInput));
     TestUtils.Simulate.keyDown(
@@ -357,7 +441,12 @@ describe("DatePicker", () => {
   });
 
   it("should hide the calendar when the pressing escape in the date input", () => {
-    var datePicker = TestUtils.renderIntoDocument(<DatePicker />);
+    var wrapper = TestUtils.renderIntoDocument(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker />
+      </UtilsContextProvider>
+    );
+    const datePicker = wrapper.children;
     var dateInput = datePicker.input;
     TestUtils.Simulate.focus(ReactDOM.findDOMNode(dateInput));
     TestUtils.Simulate.keyDown(
@@ -368,7 +457,12 @@ describe("DatePicker", () => {
   });
 
   it("should not apply the react-datepicker-ignore-onclickoutside class to the date input when closed", () => {
-    var datePicker = TestUtils.renderIntoDocument(<DatePicker />);
+    var wrapper = TestUtils.renderIntoDocument(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker />
+      </UtilsContextProvider>
+    );
+    const datePicker = wrapper.children;
     var dateInput = datePicker.input;
     expect(ReactDOM.findDOMNode(dateInput).className).to.not.contain(
       "react-datepicker-ignore-onclickoutside"
@@ -376,7 +470,12 @@ describe("DatePicker", () => {
   });
 
   it("should apply the react-datepicker-ignore-onclickoutside class to date input when open", () => {
-    var datePicker = TestUtils.renderIntoDocument(<DatePicker />);
+    var wrapper = TestUtils.renderIntoDocument(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker />
+      </UtilsContextProvider>
+    );
+    const datePicker = wrapper.children;
     var dateInput = datePicker.input;
     TestUtils.Simulate.focus(ReactDOM.findDOMNode(dateInput));
     expect(ReactDOM.findDOMNode(dateInput).className).to.contain(
@@ -385,9 +484,12 @@ describe("DatePicker", () => {
   });
 
   it("should set the type attribute on the clear button to button", () => {
-    var datePicker = TestUtils.renderIntoDocument(
-      <DatePicker selected={utils.newDate("2015-12-15")} isClearable />
+    var wrapper = TestUtils.renderIntoDocument(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker selected={utils.newDate("2015-12-15")} isClearable />
+      </UtilsContextProvider>
     );
+    const datePicker = wrapper.children;
     var clearButton = TestUtils.findRenderedDOMComponentWithClass(
       datePicker,
       "react-datepicker__close-icon"
@@ -402,13 +504,16 @@ describe("DatePicker", () => {
         cleared = true;
       }
     }
-    var datePicker = TestUtils.renderIntoDocument(
-      <DatePicker
-        selected={utils.newDate("2015-12-15")}
-        isClearable
-        onChange={handleChange}
-      />
+    var wrapper = TestUtils.renderIntoDocument(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker
+          selected={utils.newDate("2015-12-15")}
+          isClearable
+          onChange={handleChange}
+        />
+      </UtilsContextProvider>
     );
+    const datePicker = wrapper.children;
     var clearButton = TestUtils.findRenderedDOMComponentWithClass(
       datePicker,
       "react-datepicker__close-icon"
@@ -418,9 +523,12 @@ describe("DatePicker", () => {
   });
 
   it("should clear input value in the local state", () => {
-    var datePicker = TestUtils.renderIntoDocument(
-      <DatePicker selected={utils.newDate("2015-12-15")} isClearable />
+    var wrapper = TestUtils.renderIntoDocument(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker selected={utils.newDate("2015-12-15")} isClearable />
+      </UtilsContextProvider>
     );
+    const datePicker = wrapper.children;
     var clearButton = TestUtils.findRenderedDOMComponentWithClass(
       datePicker,
       "react-datepicker__close-icon"
@@ -430,13 +538,16 @@ describe("DatePicker", () => {
   });
 
   it("should set the title attribute on the clear button if clearButtonTitle is supplied", () => {
-    const datePicker = TestUtils.renderIntoDocument(
-      <DatePicker
-        selected={utils.newDate("2018-03-19")}
-        isClearable
-        clearButtonTitle="clear button"
-      />
+    const wrapper = TestUtils.renderIntoDocument(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker
+          selected={utils.newDate("2018-03-19")}
+          isClearable
+          clearButtonTitle="clear button"
+        />
+      </UtilsContextProvider>
     );
+    const datePicker = wrapper.children;
     const clearButtonText = TestUtils.findRenderedDOMComponentWithClass(
       datePicker,
       "react-datepicker__close-icon"
@@ -445,22 +556,28 @@ describe("DatePicker", () => {
   });
 
   it("should customize the className attribute on the clear button if clearButtonClassName is supplied", () => {
-    let datePicker = TestUtils.renderIntoDocument(
-      <DatePicker selected={utils.newDate("2021-04-15")} isClearable />
+    let wrapper = TestUtils.renderIntoDocument(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker selected={utils.newDate("2021-04-15")} isClearable />
+      </UtilsContextProvider>
     );
+    let datePicker = wrapper.children;
     let clearButtonClass = TestUtils.findRenderedDOMComponentWithClass(
       datePicker,
       "react-datepicker__close-icon"
     ).getAttribute("class");
     expect(clearButtonClass).to.equal("react-datepicker__close-icon");
 
-    datePicker = TestUtils.renderIntoDocument(
-      <DatePicker
-        selected={utils.newDate("2021-04-15")}
-        isClearable
-        clearButtonClassName="customized-close-icon"
-      />
+    wrapper = TestUtils.renderIntoDocument(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker
+          selected={utils.newDate("2021-04-15")}
+          isClearable
+          clearButtonClassName="customized-close-icon"
+        />
+      </UtilsContextProvider>
     );
+    datePicker = wrapper.children;
     clearButtonClass = TestUtils.findRenderedDOMComponentWithClass(
       datePicker,
       "react-datepicker__close-icon"
@@ -474,15 +591,18 @@ describe("DatePicker", () => {
     const selected = utils.newDate("2015-12-20 10:11:12");
     let date;
 
-    var datePicker = TestUtils.renderIntoDocument(
-      <DatePicker
-        inline
-        selected={selected}
-        onChange={(d) => {
-          date = d;
-        }}
-      />
+    var wrapper = TestUtils.renderIntoDocument(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker
+          inline
+          selected={selected}
+          onChange={(d) => {
+            date = d;
+          }}
+        />
+      </UtilsContextProvider>
     );
+    const datePicker = wrapper.children;
     var dayButton = TestUtils.scryRenderedDOMComponentsWithClass(
       datePicker,
       "react-datepicker__day"
@@ -498,14 +618,17 @@ describe("DatePicker", () => {
     const selected = utils.newDate("2015-12-20 10:11:12");
     let date;
 
-    var datePicker = TestUtils.renderIntoDocument(
-      <DatePicker
-        selected={selected}
-        onChange={(d) => {
-          date = d;
-        }}
-      />
+    var wrapper = TestUtils.renderIntoDocument(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker
+          selected={selected}
+          onChange={(d) => {
+            date = d;
+          }}
+        />
+      </UtilsContextProvider>
     );
+    const datePicker = wrapper.children;
 
     var input = ReactDOM.findDOMNode(datePicker.input);
     input.value = utils.newDate("2014-01-02");
@@ -524,15 +647,28 @@ describe("DatePicker", () => {
       }
 
       render() {
-        return this.state.mounted ? <DatePicker /> : null;
+        return this.state.mounted ? (
+          <UtilsContextProvider utils={utils}>
+            <DatePicker />
+          </UtilsContextProvider>
+        ) : null;
       }
     }
-    var element = TestUtils.renderIntoDocument(<TestComponent />);
+    var element = TestUtils.renderIntoDocument(
+      <UtilsContextProvider utils={utils}>
+        <TestComponent />
+      </UtilsContextProvider>
+    );
     element.setState({ mounted: false }, done);
   });
 
   it("should render calendar inside PopperComponent when inline prop is not set", () => {
-    var datePicker = TestUtils.renderIntoDocument(<DatePicker />);
+    var wrapper = TestUtils.renderIntoDocument(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker />
+      </UtilsContextProvider>
+    );
+    const datePicker = wrapper.children;
 
     expect(function () {
       TestUtils.findRenderedComponentWithType(datePicker, PopperComponent);
@@ -540,7 +676,12 @@ describe("DatePicker", () => {
   });
 
   it("should render calendar directly without PopperComponent when inline prop is set", () => {
-    var datePicker = TestUtils.renderIntoDocument(<DatePicker inline />);
+    var wrapper = TestUtils.renderIntoDocument(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker inline />
+      </UtilsContextProvider>
+    );
+    const datePicker = wrapper.children;
 
     expect(function () {
       TestUtils.findRenderedComponentWithType(datePicker, PopperComponent);
@@ -549,17 +690,23 @@ describe("DatePicker", () => {
   });
 
   it("should ignore disable prop when inline prop is set", () => {
-    var datePicker = TestUtils.renderIntoDocument(
-      <DatePicker inline disabled />
+    var wrapper = TestUtils.renderIntoDocument(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker inline disabled />
+      </UtilsContextProvider>
     );
+    const datePicker = wrapper.children;
 
     expect(datePicker.calendar).to.exist;
   });
 
   it("should ignore withPortal prop when inline prop is set", () => {
-    var datePicker = TestUtils.renderIntoDocument(
-      <DatePicker inline withPortal />
+    var wrapper = TestUtils.renderIntoDocument(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker inline withPortal />
+      </UtilsContextProvider>
     );
+    const datePicker = wrapper.children;
 
     expect(function () {
       TestUtils.findRenderedDOMComponentWithClass(
@@ -570,7 +717,12 @@ describe("DatePicker", () => {
   });
 
   it("should render Calendar in portal when withPortal is set and input has focus", () => {
-    var datePicker = TestUtils.renderIntoDocument(<DatePicker withPortal />);
+    var wrapper = TestUtils.renderIntoDocument(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker withPortal />
+      </UtilsContextProvider>
+    );
+    const datePicker = wrapper.children;
     var dateInput = datePicker.input;
     TestUtils.Simulate.focus(ReactDOM.findDOMNode(dateInput));
 
@@ -584,9 +736,12 @@ describe("DatePicker", () => {
   });
 
   it("should render Calendar in portal when withPortal is set and should close on Escape key when focus is on header", () => {
-    var datePicker = TestUtils.renderIntoDocument(
-      <DatePicker withPortal portalId="portal-id-dom-test" />
+    var wrapper = TestUtils.renderIntoDocument(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker withPortal portalId="portal-id-dom-test" />
+      </UtilsContextProvider>
     );
+    const datePicker = wrapper.children;
     var dateInput = datePicker.input;
     TestUtils.Simulate.focus(ReactDOM.findDOMNode(dateInput));
 
@@ -611,7 +766,12 @@ describe("DatePicker", () => {
   });
 
   it("should not render Calendar when withPortal is set and no focus is given to input", () => {
-    var datePicker = TestUtils.renderIntoDocument(<DatePicker withPortal />);
+    var wrapper = TestUtils.renderIntoDocument(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker withPortal />
+      </UtilsContextProvider>
+    );
+    const datePicker = wrapper.children;
 
     expect(function () {
       TestUtils.findRenderedDOMComponentWithClass(
@@ -623,9 +783,12 @@ describe("DatePicker", () => {
   });
 
   it("should render Calendar in a ReactDOM portal when withPortal is set and portalId is set", () => {
-    var datePicker = TestUtils.renderIntoDocument(
-      <DatePicker withPortal portalId="portal-id-dom-test" />
+    var wrapper = TestUtils.renderIntoDocument(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker withPortal portalId="portal-id-dom-test" />
+      </UtilsContextProvider>
     );
+    const datePicker = wrapper.children;
     var dateInput = datePicker.input;
     TestUtils.Simulate.focus(ReactDOM.findDOMNode(dateInput));
 
@@ -641,15 +804,18 @@ describe("DatePicker", () => {
     var callback = sandbox.spy();
     var onInputErrorCallback = sandbox.spy();
 
-    var datePicker = TestUtils.renderIntoDocument(
-      <DatePicker
-        selected={m}
-        onChange={callback}
-        onInputError={onInputErrorCallback}
-        dateFormat={testFormat}
-        {...opts}
-      />
+    var wrapper = TestUtils.renderIntoDocument(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker
+          selected={m}
+          onChange={callback}
+          onInputError={onInputErrorCallback}
+          dateFormat={testFormat}
+          {...opts}
+        />
+      </UtilsContextProvider>
     );
+    const datePicker = wrapper.children;
     var dateInput = datePicker.input;
     var nodeInput = ReactDOM.findDOMNode(dateInput);
     var dateCalendar = datePicker.calendar;
@@ -877,13 +1043,16 @@ describe("DatePicker", () => {
   describe("when update the datepicker input text while props.minDate is set", () => {
     let datePicker;
     beforeEach(() => {
-      datePicker = TestUtils.renderIntoDocument(
-        <DatePicker
-          selected={new Date("1993-07-02")}
-          minDate={new Date("1800/01/01")}
-          open
-        />
+      const wrapper = TestUtils.renderIntoDocument(
+        <UtilsContextProvider utils={utils}>
+          <DatePicker
+            selected={new Date("1993-07-02")}
+            minDate={new Date("1800/01/01")}
+            open
+          />
+        </UtilsContextProvider>
       );
+      datePicker = wrapper.children;
     });
 
     it("should auto update calendar when the updated date text is after props.minDate", () => {
@@ -1089,20 +1258,37 @@ describe("DatePicker", () => {
   it("should autofocus the input given the autoFocus prop", () => {
     var div = document.createElement("div");
     document.body.appendChild(div);
-    ReactDOM.render(<DatePicker autoFocus />, div);
+    ReactDOM.render(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker autoFocus />
+      </UtilsContextProvider>,
+      div
+    );
     expect(div.querySelector("input")).to.equal(document.activeElement);
   });
   it("should autofocus the input when calling the setFocus method", () => {
     var div = document.createElement("div");
     document.body.appendChild(div);
-    var datePicker = ReactDOM.render(<DatePicker />, div);
+    var wrapper = ReactDOM.render(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker />
+      </UtilsContextProvider>,
+      div
+    );
+    const datePicker = wrapper.children;
     datePicker.setFocus();
     expect(div.querySelector("input")).to.equal(document.activeElement);
   });
   it("should clear preventFocus timeout id when component is unmounted", () => {
     var div = document.createElement("div");
     document.body.appendChild(div);
-    var datePicker = ReactDOM.render(<DatePicker inline />, div);
+    var wrapper = ReactDOM.render(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker inline />
+      </UtilsContextProvider>,
+      div
+    );
+    const datePicker = wrapper.children;
     datePicker.clearPreventFocusTimeout = sinon.spy();
     ReactDOM.unmountComponentAtNode(div);
     assert(
@@ -1116,9 +1302,16 @@ describe("DatePicker", () => {
     var copyM = utils.newDate(m);
     var testFormat = "yyyy-MM-dd";
     var callback = sandbox.spy();
-    var datePicker = TestUtils.renderIntoDocument(
-      <DatePicker selected={m} onChange={callback} disabledKeyboardNavigation />
+    var wrapper = TestUtils.renderIntoDocument(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker
+          selected={m}
+          onChange={callback}
+          disabledKeyboardNavigation
+        />
+      </UtilsContextProvider>
     );
+    const datePicker = wrapper.children;
     var dateInput = datePicker.input;
     var nodeInput = ReactDOM.findDOMNode(dateInput);
     TestUtils.Simulate.focus(nodeInput);
@@ -1181,60 +1374,79 @@ describe("DatePicker", () => {
         cleared = true;
       }
     }
-    var datePicker = TestUtils.renderIntoDocument(
-      <DatePicker
-        selected={utils.newDate("2016-11-22")}
-        onChange={handleChange}
-      />
+    var wrapper = TestUtils.renderIntoDocument(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker
+          selected={utils.newDate("2016-11-22")}
+          onChange={handleChange}
+        />
+      </UtilsContextProvider>
     );
+    const datePicker = wrapper.children;
     var input = ReactDOM.findDOMNode(datePicker.input);
     input.value = "";
     TestUtils.Simulate.change(input);
     expect(cleared).to.be.true;
   });
   it("should correctly update the input when the value prop changes", () => {
-    const datePicker = mount(<DatePicker />);
-    expect(datePicker.find("input").prop("value")).to.equal("");
-    datePicker.setProps({ value: "foo" });
-    expect(datePicker.find("input").prop("value")).to.equal("foo");
+    const wrapper = mount(
+      React.createElement((props) => (
+        <UtilsContextProvider utils={utils}>
+          <DatePicker {...props} />
+        </UtilsContextProvider>
+      ))
+    );
+
+    expect(wrapper.find("input").prop("value")).to.equal("");
+    wrapper.setProps({ value: "foo" });
+    expect(wrapper.find("input").prop("value")).to.equal("foo");
   });
   it("should preserve user input as they are typing", () => {
-    const onChange = (date) => datePicker.setProps({ selected: date });
-    const datePicker = mount(
-      <DatePicker
-        dateFormat={["yyyy-MM-dd", "MM/dd/yyyy", "MM/dd/yy"]}
-        onChange={onChange}
-      />
+    const onChange = (date) => wrapper.setProps({ selected: date });
+    const wrapper = mount(
+      React.createElement((props) => (
+        <UtilsContextProvider utils={utils}>
+          <DatePicker
+            dateFormat={["yyyy-MM-dd", "MM/dd/yyyy", "MM/dd/yy"]}
+            onChange={onChange}
+            {...props}
+          />
+        </UtilsContextProvider>
+      ))
     );
-    expect(datePicker.find("input").prop("value")).to.equal("");
+    const datePicker = wrapper.find(DatePicker).first();
+    expect(wrapper.find("input").prop("value")).to.equal("");
 
     const str = "12/30/1982";
-    datePicker.find("input").simulate("focus");
+    wrapper.find("input").simulate("focus");
     str.split("").forEach((c, i) => {
-      datePicker.find("input").simulate("change", {
-        target: { value: datePicker.find("input").prop("value") + c },
+      wrapper.find("input").simulate("change", {
+        target: { value: wrapper.find("input").prop("value") + c },
       });
-      datePicker.update();
-      expect(datePicker.find("input").prop("value")).to.equal(
+      wrapper.update();
+      expect(wrapper.find("input").prop("value")).to.equal(
         str.substring(0, i + 1)
       );
     });
-    expect(
-      utils.formatDate(datePicker.prop("selected"), "yyyy-MM-dd")
-    ).to.equal("1982-12-30");
+    expect(utils.formatDate(wrapper.prop("selected"), "yyyy-MM-dd")).to.equal(
+      "1982-12-30"
+    );
   });
   it("should invoke provided onChangeRaw function and should not invoke provided onSelect function on manual input change", () => {
     const inputValue = "test";
     const onChangeRawSpy = sandbox.spy();
     const onSelectSpy = sandbox.spy();
-    const datePicker = TestUtils.renderIntoDocument(
-      <DatePicker
-        selected={utils.newDate()}
-        onChange={sandbox.spy()}
-        onChangeRaw={onChangeRawSpy}
-        onSelect={onSelectSpy}
-      />
+    const wrapper = TestUtils.renderIntoDocument(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker
+          selected={utils.newDate()}
+          onChange={sandbox.spy()}
+          onChangeRaw={onChangeRawSpy}
+          onSelect={onSelectSpy}
+        />
+      </UtilsContextProvider>
     );
+    const datePicker = wrapper.children;
     expect(onChangeRawSpy.called).to.be.false;
     expect(onSelectSpy.called).to.be.false;
     const input = ReactDOM.findDOMNode(datePicker.input);
@@ -1247,14 +1459,17 @@ describe("DatePicker", () => {
   it("should invoke provided onChangeRaw and onSelect functions when clicking a day on the calendar", () => {
     const onChangeRawSpy = sandbox.spy();
     const onSelectSpy = sandbox.spy();
-    const datePicker = TestUtils.renderIntoDocument(
-      <DatePicker
-        selected={utils.newDate()}
-        onChange={sandbox.spy()}
-        onChangeRaw={onChangeRawSpy}
-        onSelect={onSelectSpy}
-      />
+    const wrapper = TestUtils.renderIntoDocument(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker
+          selected={utils.newDate()}
+          onChange={sandbox.spy()}
+          onChangeRaw={onChangeRawSpy}
+          onSelect={onSelectSpy}
+        />
+      </UtilsContextProvider>
     );
+    const datePicker = wrapper.children;
     expect(onChangeRawSpy.called).to.be.false;
     expect(onSelectSpy.called).to.be.false;
     const input = ReactDOM.findDOMNode(datePicker.input);
@@ -1269,26 +1484,34 @@ describe("DatePicker", () => {
   });
   it("should allow onChangeRaw to prevent a change", () => {
     const onChangeRaw = (e) => e.target.value > "2" && e.preventDefault();
-    const datePicker = mount(<DatePicker onChangeRaw={onChangeRaw} />);
-    expect(datePicker.find("input").prop("value")).to.equal("");
-    datePicker.find("input").simulate("change", { target: { value: "3" } });
+    const wrapper = mount(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker onChangeRaw={onChangeRaw} />
+      </UtilsContextProvider>
+    );
+    const datePicker = wrapper.find(DatePicker).first();
+    expect(wrapper.find("input").prop("value")).to.equal("");
+    wrapper.find("input").simulate("change", { target: { value: "3" } });
     datePicker.update();
-    expect(datePicker.find("input").prop("value")).to.equal("");
-    datePicker.find("input").simulate("change", { target: { value: "1" } });
+    expect(wrapper.find("input").prop("value")).to.equal("");
+    wrapper.find("input").simulate("change", { target: { value: "1" } });
     datePicker.update();
-    expect(datePicker.find("input").prop("value")).to.equal("1");
+    expect(wrapper.find("input").prop("value")).to.equal("1");
   });
   it("should call onChangeRaw with all arguments", () => {
     const inputValue = "test";
     const onChangeRawSpy = sandbox.spy();
-    const datePicker = TestUtils.renderIntoDocument(
-      <DatePicker
-        selected={utils.newDate()}
-        onChange={sandbox.spy()}
-        customInput={<CustomInput />}
-        onChangeRaw={onChangeRawSpy}
-      />
+    const wrapper = TestUtils.renderIntoDocument(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker
+          selected={utils.newDate()}
+          onChange={sandbox.spy()}
+          customInput={<CustomInput />}
+          onChangeRaw={onChangeRawSpy}
+        />
+      </UtilsContextProvider>
     );
+    const datePicker = wrapper.children;
     expect(onChangeRawSpy.called).to.be.false;
     const input = ReactDOM.findDOMNode(datePicker.input);
     input.value = inputValue;
@@ -1301,14 +1524,17 @@ describe("DatePicker", () => {
     const inputValue = "test";
     const onChangeRawSpy = sandbox.spy();
     let customInput = <CustomInput onChangeArgs={(e) => [e.target.value]} />;
-    const datePicker = TestUtils.renderIntoDocument(
-      <DatePicker
-        selected={utils.newDate()}
-        onChange={sandbox.spy()}
-        customInput={customInput}
-        onChangeRaw={onChangeRawSpy}
-      />
+    const wrapper = TestUtils.renderIntoDocument(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker
+          selected={utils.newDate()}
+          onChange={sandbox.spy()}
+          customInput={customInput}
+          onChangeRaw={onChangeRawSpy}
+        />
+      </UtilsContextProvider>
     );
+    const datePicker = wrapper.children;
     expect(onChangeRawSpy.called).to.be.false;
     const input = ReactDOM.findDOMNode(datePicker.input);
     input.value = inputValue;
@@ -1317,9 +1543,12 @@ describe("DatePicker", () => {
     expect(onChangeRawSpy.args[0][0]).to.equal("test");
   });
   it("should handle a click outside of the calendar", () => {
-    const datePicker = mount(
-      <DatePicker selected={utils.newDate()} withPortal />
-    ).instance();
+    const wrapper = mount(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker selected={utils.newDate()} withPortal />
+      </UtilsContextProvider>
+    );
+    const datePicker = wrapper.find(DatePicker).first().instance();
     const openSpy = sandbox.spy(datePicker, "setOpen");
     datePicker.handleCalendarClickOutside(
       sandbox.stub({ preventDefault: () => {} })
@@ -1328,74 +1557,111 @@ describe("DatePicker", () => {
     expect(openSpy.calledWithExactly(false)).to.be.true;
   });
   it("should default to the currently selected date", () => {
-    const datePicker = mount(
-      <DatePicker selected={utils.newDate("1988-12-30")} />
+    const wrapper = mount(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker selected={utils.newDate("1988-12-30")} />
+      </UtilsContextProvider>
     );
+    const datePicker = wrapper.find(DatePicker).first();
     expect(
       utils.formatDate(datePicker.state("preSelection"), "yyyy-MM-dd")
     ).to.equal("1988-12-30");
   });
   it("should default to the start date when selecting an end date", () => {
-    const datePicker = mount(
-      <DatePicker startDate={utils.newDate("1988-11-30")} selectsEnd />
+    const wrapper = mount(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker startDate={utils.newDate("1988-11-30")} selectsEnd />
+      </UtilsContextProvider>
     );
+    const datePicker = wrapper.find(DatePicker).first();
     expect(
       utils.formatDate(datePicker.state("preSelection"), "yyyy-MM-dd")
     ).to.equal("1988-11-30");
   });
   it("should default to the end date when selecting a start date", () => {
-    const datePicker = mount(
-      <DatePicker endDate={utils.newDate("1988-12-31")} selectsStart />
+    const wrapper = mount(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker endDate={utils.newDate("1988-12-31")} selectsStart />
+      </UtilsContextProvider>
     );
+    const datePicker = wrapper.find(DatePicker).first();
     expect(
       utils.formatDate(datePicker.state("preSelection"), "yyyy-MM-dd")
     ).to.equal("1988-12-31");
   });
   it("should default to a date <= maxDate", () => {
-    const datePicker = mount(
-      <DatePicker maxDate={utils.newDate("1982-01-01")} />
+    const wrapper = mount(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker maxDate={utils.newDate("1982-01-01")} />
+      </UtilsContextProvider>
     );
+    const datePicker = wrapper.find(DatePicker).first();
     expect(
       utils.formatDate(datePicker.state("preSelection"), "yyyy-MM-dd")
     ).to.equal("1982-01-01");
   });
   it("should default to a date >= minDate", () => {
-    const datePicker = mount(
-      <DatePicker minDate={utils.newDate("2063-04-05")} />
+    const wrapper = mount(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker minDate={utils.newDate("2063-04-05")} />
+      </UtilsContextProvider>
     );
+    const datePicker = wrapper.find(DatePicker).first();
     expect(
       utils.formatDate(datePicker.state("preSelection"), "yyyy-MM-dd")
     ).to.equal("2063-04-05");
   });
   it("should default to the openToDate if there is one", () => {
-    const datePicker = mount(
-      <DatePicker openToDate={utils.newDate("2020-01-23")} />
+    const wrapper = mount(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker openToDate={utils.newDate("2020-01-23")} />
+      </UtilsContextProvider>
     );
+    const datePicker = wrapper.find(DatePicker).first();
     expect(
       utils.formatDate(datePicker.state("preSelection"), "yyyy-MM-dd")
     ).to.equal("2020-01-23");
   });
   it("should otherwise default to the current date", () => {
-    const datePicker = mount(<DatePicker />);
+    const wrapper = mount(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker />
+      </UtilsContextProvider>
+    );
+    const datePicker = wrapper.find(DatePicker).first();
     expect(
       utils.formatDate(datePicker.state("preSelection"), "yyyy-MM-dd")
     ).to.equal(utils.formatDate(utils.newDate(), "yyyy-MM-dd"));
   });
   it("should support an initial null `selected` value in inline mode", () => {
-    const datePicker = mount(<DatePicker inline selected={null} />);
+    const wrapper = mount(
+      React.createElement((props) => (
+        <UtilsContextProvider utils={utils}>
+          <DatePicker inline selected={null} {...props} />
+        </UtilsContextProvider>
+      ))
+    );
+    const datePicker = wrapper.find(DatePicker).first();
 
     expect(() =>
-      datePicker.setProps({ selected: utils.newDate() })
+      wrapper.setProps({ selected: utils.newDate() })
     ).to.not.throw();
   });
   it("should switch month in inline mode immediately", () => {
     const selected = utils.newDate();
     const future = utils.addDays(utils.newDate(), 100);
-    const datePicker = mount(<DatePicker inline selected={selected} />);
+    const wrapper = mount(
+      React.createElement((props) => (
+        <UtilsContextProvider utils={utils}>
+          <DatePicker inline selected={selected} {...props} />
+        </UtilsContextProvider>
+      ))
+    );
+    const datePicker = wrapper.find(DatePicker).first();
     expect(
       utils.formatDate(datePicker.state("preSelection"), "yyyy-MM-dd")
     ).to.equal(utils.formatDate(selected, "yyyy-MM-dd"));
-    datePicker.setProps({ selected: future });
+    wrapper.setProps({ selected: future });
     expect(
       utils.formatDate(datePicker.state("preSelection"), "yyyy-MM-dd")
     ).to.equal(utils.formatDate(future, "yyyy-MM-dd"));
@@ -1403,27 +1669,40 @@ describe("DatePicker", () => {
   it("should switch month in inline mode immediately, when year is updated", () => {
     const selected = utils.newDate();
     const future = utils.addYears(utils.newDate(), 1);
-    const datePicker = mount(<DatePicker inline selected={selected} />);
+    const wrapper = mount(
+      React.createElement((props) => (
+        <UtilsContextProvider utils={utils}>
+          <DatePicker inline selected={selected} {...props} />
+        </UtilsContextProvider>
+      ))
+    );
+    const datePicker = wrapper.find(DatePicker).first();
     expect(
       utils.formatDate(datePicker.state("preSelection"), "yyyy-MM-dd")
     ).to.equal(utils.formatDate(selected, "yyyy-MM-dd"));
-    datePicker.setProps({ selected: future });
+    wrapper.setProps({ selected: future });
     expect(
       utils.formatDate(datePicker.state("preSelection"), "yyyy-MM-dd")
     ).to.equal(utils.formatDate(future, "yyyy-MM-dd"));
   });
   it("should not set open state when focusing on the date input and the preventOpenOnFocus prop is set", () => {
-    const datePicker = TestUtils.renderIntoDocument(
-      <DatePicker preventOpenOnFocus />
+    const wrapper = TestUtils.renderIntoDocument(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker preventOpenOnFocus />
+      </UtilsContextProvider>
     );
+    const datePicker = wrapper.children;
     const dateInput = datePicker.input;
     TestUtils.Simulate.focus(ReactDOM.findDOMNode(dateInput));
     expect(datePicker.state.open).to.be.false;
   });
   it("should not set open state onInputKeyDown when preventOpenOnFocus prop is set", () => {
-    const datePicker = TestUtils.renderIntoDocument(
-      <DatePicker preventOpenOnFocus />
+    const wrapper = TestUtils.renderIntoDocument(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker preventOpenOnFocus />
+      </UtilsContextProvider>
     );
+    const datePicker = wrapper.children;
     const dateInput = datePicker.input;
     TestUtils.Simulate.keyDown(
       ReactDOM.findDOMNode(dateInput),
@@ -1432,36 +1711,60 @@ describe("DatePicker", () => {
     expect(datePicker.state.open).to.be.false;
   });
   it("should clear the input when clear() member function is called", () => {
-    const datePicker = TestUtils.renderIntoDocument(
-      <DatePicker selected={utils.newDate("2015-12-15")} />
+    const wrapper = TestUtils.renderIntoDocument(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker selected={utils.newDate("2015-12-15")} />
+      </UtilsContextProvider>
     );
+    const datePicker = wrapper.children;
     datePicker.clear();
     expect(datePicker.state.inputValue).to.be.null;
   });
   it("should not open when open is false and input is focused", () => {
-    var datePicker = TestUtils.renderIntoDocument(<DatePicker open={false} />);
+    var wrapper = TestUtils.renderIntoDocument(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker open={false} />
+      </UtilsContextProvider>
+    );
+    const datePicker = wrapper.children;
     var dateInput = datePicker.input;
     TestUtils.Simulate.focus(ReactDOM.findDOMNode(dateInput));
     expect(datePicker.calendar).to.not.exist;
   });
   it("should open when open is true", () => {
-    var datePicker = TestUtils.renderIntoDocument(<DatePicker open />);
+    var wrapper = TestUtils.renderIntoDocument(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker open />
+      </UtilsContextProvider>
+    );
+    const datePicker = wrapper.children;
     expect(datePicker.calendar).to.exist;
   });
   it("should fire onInputClick when input is clicked", () => {
     const onInputClickSpy = sinon.spy();
-    var datePicker = mount(<DatePicker onInputClick={onInputClickSpy} />)
+    var wrapper = mount(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker onInputClick={onInputClickSpy} />
+      </UtilsContextProvider>
+    )
       .find("input")
       .simulate("click");
     assert(onInputClickSpy.callCount, 1);
   });
 
   it("should set monthSelectedIn to 0 if monthsShown prop changes", () => {
-    const datePicker = mount(<DatePicker monthsShown={2} inline />);
-    datePicker.setState({ monthSelectedIn: 1 }, () => {
+    const wrapper = mount(
+      React.createElement((props) => (
+        <UtilsContextProvider utils={utils}>
+          <DatePicker monthsShown={2} inline {...props} />
+        </UtilsContextProvider>
+      ))
+    );
+    const datePicker = wrapper.find(DatePicker).first();
+    datePicker.instance().setState({ monthSelectedIn: 1 }, () => {
       assert.equal(datePicker.state("monthSelectedIn"), 1);
-      datePicker.setProps({ monthsShown: 1 }, () => {
-        assert.equal(datePicker.props().monthsShown, 1);
+      wrapper.setProps({ monthsShown: 1 }, () => {
+        assert.equal(wrapper.props().monthsShown, 1);
         setTimeout(() => {
           // Give setState in componentDidUpdate time to run
           assert.equal(datePicker.state("monthSelectedIn"), 0);
@@ -1471,9 +1774,12 @@ describe("DatePicker", () => {
   });
 
   it("should disable non-jumping if prop focusSelectedMonth is true", () => {
-    var datePickerInline = TestUtils.renderIntoDocument(
-      <DatePicker inline monthsShown={2} focusSelectedMonth />
+    var wrapper = TestUtils.renderIntoDocument(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker inline monthsShown={2} focusSelectedMonth />
+      </UtilsContextProvider>
     );
+    const datePickerInline = wrapper.children;
     var dayButtonInline = TestUtils.scryRenderedDOMComponentsWithClass(
       datePickerInline,
       "react-datepicker__day"
@@ -1483,9 +1789,12 @@ describe("DatePicker", () => {
   });
 
   it("should show the popper arrow when showPopperArrow is true", () => {
-    const datePicker = TestUtils.renderIntoDocument(
-      <DatePicker showPopperArrow />
+    const wrapper = TestUtils.renderIntoDocument(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker showPopperArrow />
+      </UtilsContextProvider>
     );
+    const datePicker = wrapper.children;
     const dateInput = datePicker.input;
     TestUtils.Simulate.click(ReactDOM.findDOMNode(dateInput));
 
@@ -1498,9 +1807,12 @@ describe("DatePicker", () => {
   });
 
   it("should not show the popper arrow when showPopperArrow is false", () => {
-    const datePicker = TestUtils.renderIntoDocument(
-      <DatePicker showPopperArrow={false} />
+    const wrapper = TestUtils.renderIntoDocument(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker showPopperArrow={false} />
+      </UtilsContextProvider>
     );
+    const datePicker = wrapper.children;
     const dateInput = datePicker.input;
     TestUtils.Simulate.click(ReactDOM.findDOMNode(dateInput));
 
@@ -1514,57 +1826,73 @@ describe("DatePicker", () => {
 
   it("should pass chooseDayAriaLabelPrefix prop to the correct child component", () => {
     const chooseDayAriaLabelPrefix = "My choose-day-prefix";
-    const datePicker = mount(
-      <DatePicker inline chooseDayAriaLabelPrefix={chooseDayAriaLabelPrefix} />
+    const wrapper = mount(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker
+          inline
+          chooseDayAriaLabelPrefix={chooseDayAriaLabelPrefix}
+        />
+      </UtilsContextProvider>
     );
     expect(
-      datePicker.find(Day).first().prop("ariaLabelPrefixWhenEnabled")
+      wrapper.find(Day).first().prop("ariaLabelPrefixWhenEnabled")
     ).to.equal(chooseDayAriaLabelPrefix);
   });
 
   it("should pass disabledDayAriaLabelPrefix prop to the correct child component", () => {
     const disabledDayAriaLabelPrefix = "My disabled-day-prefix";
-    const datePicker = mount(
-      <DatePicker
-        inline
-        disabledDayAriaLabelPrefix={disabledDayAriaLabelPrefix}
-      />
+    const wrapper = mount(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker
+          inline
+          disabledDayAriaLabelPrefix={disabledDayAriaLabelPrefix}
+        />
+      </UtilsContextProvider>
     );
     expect(
-      datePicker.find(Day).first().prop("ariaLabelPrefixWhenDisabled")
+      wrapper.find(Day).first().prop("ariaLabelPrefixWhenDisabled")
     ).to.equal(disabledDayAriaLabelPrefix);
   });
 
   it("should pass weekAriaLabelPrefix prop to the correct child component", () => {
     const weekAriaLabelPrefix = "My week-prefix";
-    const datePicker = mount(
-      <DatePicker
-        inline
-        showWeekNumbers
-        weekAriaLabelPrefix={weekAriaLabelPrefix}
-      />
+    const wrapper = mount(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker
+          inline
+          showWeekNumbers
+          weekAriaLabelPrefix={weekAriaLabelPrefix}
+        />
+      </UtilsContextProvider>
     );
-    expect(
-      datePicker.find(WeekNumber).first().prop("ariaLabelPrefix")
-    ).to.equal(weekAriaLabelPrefix);
+    expect(wrapper.find(WeekNumber).first().prop("ariaLabelPrefix")).to.equal(
+      weekAriaLabelPrefix
+    );
   });
 
   it("should pass monthAriaLabelPrefix prop to the correct child component", () => {
     const monthAriaLabelPrefix = "My month-prefix";
-    const datePicker = mount(
-      <DatePicker
-        inline
-        showWeekNumbers
-        monthAriaLabelPrefix={monthAriaLabelPrefix}
-      />
+    const wrapper = mount(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker
+          inline
+          showWeekNumbers
+          monthAriaLabelPrefix={monthAriaLabelPrefix}
+        />
+      </UtilsContextProvider>
     );
-    expect(datePicker.find(Month).first().prop("ariaLabelPrefix")).to.equal(
+    expect(wrapper.find(Month).first().prop("ariaLabelPrefix")).to.equal(
       monthAriaLabelPrefix
     );
   });
 
   it("should close the calendar after scrolling", () => {
-    var datePicker = TestUtils.renderIntoDocument(<DatePicker closeOnScroll />);
+    var wrapper = TestUtils.renderIntoDocument(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker closeOnScroll />
+      </UtilsContextProvider>
+    );
+    const datePicker = wrapper.children;
     var dateInput = datePicker.input;
     TestUtils.Simulate.focus(ReactDOM.findDOMNode(dateInput));
     expect(datePicker.state.open).to.be.true;
@@ -1573,7 +1901,12 @@ describe("DatePicker", () => {
   });
 
   it("should not close the calendar after scrolling", () => {
-    var datePicker = TestUtils.renderIntoDocument(<DatePicker closeOnScroll />);
+    var wrapper = TestUtils.renderIntoDocument(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker closeOnScroll />
+      </UtilsContextProvider>
+    );
+    const datePicker = wrapper.children;
     var dateInput = datePicker.input;
     TestUtils.Simulate.focus(ReactDOM.findDOMNode(dateInput));
     datePicker.onScroll({ target: "something" });
@@ -1581,9 +1914,12 @@ describe("DatePicker", () => {
   });
 
   it("should close the calendar after scrolling", () => {
-    var datePicker = TestUtils.renderIntoDocument(
-      <DatePicker closeOnScroll={() => true} />
+    var wrapper = TestUtils.renderIntoDocument(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker closeOnScroll={() => true} />
+      </UtilsContextProvider>
     );
+    const datePicker = wrapper.children;
     var dateInput = datePicker.input;
     TestUtils.Simulate.focus(ReactDOM.findDOMNode(dateInput));
     expect(datePicker.state.open).to.be.true;
@@ -1592,9 +1928,12 @@ describe("DatePicker", () => {
   });
 
   it("should not close the calendar after scrolling", () => {
-    var datePicker = TestUtils.renderIntoDocument(
-      <DatePicker closeOnScroll={() => false} />
+    var wrapper = TestUtils.renderIntoDocument(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker closeOnScroll={() => false} />
+      </UtilsContextProvider>
     );
+    const datePicker = wrapper.children;
     var dateInput = datePicker.input;
     TestUtils.Simulate.focus(ReactDOM.findDOMNode(dateInput));
     datePicker.onScroll();
@@ -1608,16 +1947,19 @@ describe("DatePicker", () => {
       const onChange = (dates = []) => {
         [startDate, endDate] = dates;
       };
-      const datePicker = TestUtils.renderIntoDocument(
-        <DatePicker
-          selected={selected}
-          onChange={onChange}
-          startDate={startDate}
-          endDate={endDate}
-          selectsRange
-          inline
-        />
+      const wrapper = TestUtils.renderIntoDocument(
+        <UtilsContextProvider utils={utils}>
+          <DatePicker
+            selected={selected}
+            onChange={onChange}
+            startDate={startDate}
+            endDate={endDate}
+            selectsRange
+            inline
+          />
+        </UtilsContextProvider>
       );
+      const datePicker = wrapper.children;
 
       const days = TestUtils.scryRenderedComponentsWithType(datePicker, Day);
       const selectedDay = days.find(
@@ -1639,16 +1981,19 @@ describe("DatePicker", () => {
       const onChange = (dates = []) => {
         [startDate, endDate] = dates;
       };
-      const datePicker = TestUtils.renderIntoDocument(
-        <DatePicker
-          selected={startDate}
-          onChange={onChange}
-          startDate={startDate}
-          endDate={endDate}
-          selectsRange
-          inline
-        />
+      const wrapper = TestUtils.renderIntoDocument(
+        <UtilsContextProvider utils={utils}>
+          <DatePicker
+            selected={startDate}
+            onChange={onChange}
+            startDate={startDate}
+            endDate={endDate}
+            selectsRange
+            inline
+          />
+        </UtilsContextProvider>
       );
+      const datePicker = wrapper.children;
       const days = TestUtils.scryRenderedComponentsWithType(datePicker, Day);
       const selectedDay = days.find(
         (d) =>
@@ -1670,16 +2015,19 @@ describe("DatePicker", () => {
       const onChange = (dates = []) => {
         [startDate, endDate] = dates;
       };
-      let datePicker = TestUtils.renderIntoDocument(
-        <DatePicker
-          selected={selected}
-          onChange={onChange}
-          startDate={startDate}
-          endDate={endDate}
-          selectsRange
-          inline
-        />
+      let wrapper = TestUtils.renderIntoDocument(
+        <UtilsContextProvider utils={utils}>
+          <DatePicker
+            selected={selected}
+            onChange={onChange}
+            startDate={startDate}
+            endDate={endDate}
+            selectsRange
+            inline
+          />
+        </UtilsContextProvider>
       );
+      const datePicker = wrapper.children;
 
       let days = TestUtils.scryRenderedComponentsWithType(datePicker, Day);
       let selectedDay = days.find(
@@ -1701,16 +2049,19 @@ describe("DatePicker", () => {
       const onChange = (dates = []) => {
         [startDate, endDate] = dates;
       };
-      let datePicker = TestUtils.renderIntoDocument(
-        <DatePicker
-          selected={selected}
-          onChange={onChange}
-          startDate={startDate}
-          endDate={endDate}
-          selectsRange
-          inline
-        />
+      let wrapper = TestUtils.renderIntoDocument(
+        <UtilsContextProvider utils={utils}>
+          <DatePicker
+            selected={selected}
+            onChange={onChange}
+            startDate={startDate}
+            endDate={endDate}
+            selectsRange
+            inline
+          />
+        </UtilsContextProvider>
       );
+      const datePicker = wrapper.children;
       let days = TestUtils.scryRenderedComponentsWithType(datePicker, Day);
       const selectedDay = days.find(
         (d) =>
@@ -1729,9 +2080,12 @@ describe("DatePicker", () => {
     it("should have preSelection set to startDate upon opening", () => {
       const startDate = new Date("2021-04-20 00:00:00");
       const endDate = null;
-      const datePicker = TestUtils.renderIntoDocument(
-        <DatePicker selectsRange startDate={startDate} endDate={endDate} />
+      const wrapper = TestUtils.renderIntoDocument(
+        <UtilsContextProvider utils={utils}>
+          <DatePicker selectsRange startDate={startDate} endDate={endDate} />
+        </UtilsContextProvider>
       );
+      const datePicker = wrapper.children;
       const dateInput = datePicker.input;
       // Click to open
       TestUtils.Simulate.click(ReactDOM.findDOMNode(dateInput));
@@ -1741,9 +2095,12 @@ describe("DatePicker", () => {
     it("should remain open after clicking day when startDate is null", () => {
       const startDate = null;
       const endDate = null;
-      const datePicker = TestUtils.renderIntoDocument(
-        <DatePicker selectsRange startDate={startDate} endDate={endDate} />
+      const wrapper = TestUtils.renderIntoDocument(
+        <UtilsContextProvider utils={utils}>
+          <DatePicker selectsRange startDate={startDate} endDate={endDate} />
+        </UtilsContextProvider>
       );
+      const datePicker = wrapper.children;
       const dateInput = datePicker.input;
       // Click to open
       TestUtils.Simulate.click(ReactDOM.findDOMNode(dateInput));
@@ -1756,9 +2113,12 @@ describe("DatePicker", () => {
     it("should be closed after clicking day when startDate has a value (endDate is being selected)", () => {
       const startDate = new Date("2021-01-01 00:00:00");
       const endDate = null;
-      const datePicker = TestUtils.renderIntoDocument(
-        <DatePicker selectsRange startDate={startDate} endDate={endDate} />
+      const wrapper = TestUtils.renderIntoDocument(
+        <UtilsContextProvider utils={utils}>
+          <DatePicker selectsRange startDate={startDate} endDate={endDate} />
+        </UtilsContextProvider>
       );
+      const datePicker = wrapper.children;
       datePicker.setOpen(true);
 
       const days = TestUtils.scryRenderedComponentsWithType(datePicker, Day);
@@ -1771,14 +2131,17 @@ describe("DatePicker", () => {
       const startDate = new Date("2021-01-01 00:00:00");
       const endDate = new Date("2021-01-21 00:00:00");
 
-      const datePicker = TestUtils.renderIntoDocument(
-        <DatePicker
-          selectsRange
-          startDate={startDate}
-          endDate={endDate}
-          isClearable
-        />
+      const wrapper = TestUtils.renderIntoDocument(
+        <UtilsContextProvider utils={utils}>
+          <DatePicker
+            selectsRange
+            startDate={startDate}
+            endDate={endDate}
+            isClearable
+          />
+        </UtilsContextProvider>
       );
+      const datePicker = wrapper.children;
 
       const clearButton = TestUtils.findRenderedDOMComponentWithClass(
         datePicker,
@@ -1789,15 +2152,18 @@ describe("DatePicker", () => {
 
     it("clearing calls onChange with [null, null] in first argument making it consistent with the onChange behaviour for selecting days for selectsRange", () => {
       const onChangeSpy = sandbox.spy();
-      const datePicker = TestUtils.renderIntoDocument(
-        <DatePicker
-          selectsRange
-          startDate={null}
-          endDate={null}
-          onChange={onChangeSpy}
-          isClearable
-        />
+      const wrapper = TestUtils.renderIntoDocument(
+        <UtilsContextProvider utils={utils}>
+          <DatePicker
+            selectsRange
+            startDate={null}
+            endDate={null}
+            onChange={onChangeSpy}
+            isClearable
+          />
+        </UtilsContextProvider>
       );
+      const datePicker = wrapper.children;
 
       datePicker.clear();
 
@@ -1810,14 +2176,22 @@ describe("DatePicker", () => {
 
   describe("duplicate dates when multiple months", () => {
     it("should find duplicates at end on all months except last month", () => {
-      const twoMonths = mount(<DatePicker monthsShown={2} />);
+      const twoMonths = mount(
+        <UtilsContextProvider utils={utils}>
+          <DatePicker monthsShown={2} />
+        </UtilsContextProvider>
+      );
       twoMonths.find("input").simulate("click");
       const months = twoMonths.find(Month);
       expect(months).to.have.lengthOf(2);
       expect(months.first().props().monthShowsDuplicateDaysEnd).to.be.true;
       expect(months.last().props().monthShowsDuplicateDaysEnd).to.be.false;
 
-      const moreThanTwoMonths = mount(<DatePicker monthsShown={4} />);
+      const moreThanTwoMonths = mount(
+        <UtilsContextProvider utils={utils}>
+          <DatePicker monthsShown={4} />
+        </UtilsContextProvider>
+      );
       moreThanTwoMonths.find("input").simulate("click");
       const monthsMore = moreThanTwoMonths.find(Month);
       expect(monthsMore).to.have.lengthOf(4);
@@ -1828,14 +2202,22 @@ describe("DatePicker", () => {
     });
 
     it("should find duplicates at start on all months except first month", () => {
-      const twoMonths = mount(<DatePicker monthsShown={2} />);
+      const twoMonths = mount(
+        <UtilsContextProvider utils={utils}>
+          <DatePicker monthsShown={2} />
+        </UtilsContextProvider>
+      );
       twoMonths.find("input").simulate("click");
       const months = twoMonths.find(Month);
       expect(months).to.have.lengthOf(2);
       expect(months.first().props().monthShowsDuplicateDaysStart).to.be.false;
       expect(months.last().props().monthShowsDuplicateDaysStart).to.be.true;
 
-      const moreThanTwoMonths = mount(<DatePicker monthsShown={4} />);
+      const moreThanTwoMonths = mount(
+        <UtilsContextProvider utils={utils}>
+          <DatePicker monthsShown={4} />
+        </UtilsContextProvider>
+      );
       moreThanTwoMonths.find("input").simulate("click");
       const monthsMore = moreThanTwoMonths.find(Month);
       expect(monthsMore).to.have.lengthOf(4);
@@ -1847,7 +2229,11 @@ describe("DatePicker", () => {
     });
 
     it("should not find duplicates when single month displayed", () => {
-      const datepicker = mount(<DatePicker />);
+      const datepicker = mount(
+        <UtilsContextProvider utils={utils}>
+          <DatePicker />
+        </UtilsContextProvider>
+      );
       datepicker.find("input").simulate("click");
       const months = datepicker.find(Month);
       expect(months).to.have.lengthOf(1);
@@ -1860,13 +2246,16 @@ describe("DatePicker", () => {
     const dateFormat = "yyyy-MM-dd";
 
     it("should not be updated when navigating with ArrowRight key without changing displayed month", () => {
-      const datePickerInline = TestUtils.renderIntoDocument(
-        <DatePicker
-          selected={utils.newDate("2020-11-15")}
-          dateFormat={dateFormat}
-          inline
-        />
+      const wrapper = TestUtils.renderIntoDocument(
+        <UtilsContextProvider utils={utils}>
+          <DatePicker
+            selected={utils.newDate("2020-11-15")}
+            dateFormat={dateFormat}
+            inline
+          />
+        </UtilsContextProvider>
       );
+      const datePickerInline = wrapper.children;
       TestUtils.Simulate.keyDown(
         getSelectedDayNode(datePickerInline),
         getKey("ArrowRight")
@@ -1875,13 +2264,16 @@ describe("DatePicker", () => {
     });
 
     it("should be set to true when changing displayed month with ArrowRight key", () => {
-      const datePickerInline = TestUtils.renderIntoDocument(
-        <DatePicker
-          selected={utils.newDate("2020-11-30")}
-          dateFormat={dateFormat}
-          inline
-        />
+      const wrapper = TestUtils.renderIntoDocument(
+        <UtilsContextProvider utils={utils}>
+          <DatePicker
+            selected={utils.newDate("2020-11-30")}
+            dateFormat={dateFormat}
+            inline
+          />
+        </UtilsContextProvider>
       );
+      const datePickerInline = wrapper.children;
       TestUtils.Simulate.keyDown(
         getSelectedDayNode(datePickerInline),
         getKey("ArrowRight")
@@ -1890,13 +2282,16 @@ describe("DatePicker", () => {
     });
 
     it("should be set to true when changing displayed month with PageDown key", () => {
-      const datePickerInline = TestUtils.renderIntoDocument(
-        <DatePicker
-          selected={utils.newDate("2020-11-15")}
-          dateFormat={dateFormat}
-          inline
-        />
+      const wrapper = TestUtils.renderIntoDocument(
+        <UtilsContextProvider utils={utils}>
+          <DatePicker
+            selected={utils.newDate("2020-11-15")}
+            dateFormat={dateFormat}
+            inline
+          />
+        </UtilsContextProvider>
       );
+      const datePickerInline = wrapper.children;
       TestUtils.Simulate.keyDown(
         getSelectedDayNode(datePickerInline),
         getKey("PageDown")
@@ -1905,13 +2300,16 @@ describe("DatePicker", () => {
     });
 
     it("should be set to true when changing displayed month with End key", () => {
-      const datePickerInline = TestUtils.renderIntoDocument(
-        <DatePicker
-          selected={utils.newDate("2020-11-15")}
-          dateFormat={dateFormat}
-          inline
-        />
+      const wrapper = TestUtils.renderIntoDocument(
+        <UtilsContextProvider utils={utils}>
+          <DatePicker
+            selected={utils.newDate("2020-11-15")}
+            dateFormat={dateFormat}
+            inline
+          />
+        </UtilsContextProvider>
       );
+      const datePickerInline = wrapper.children;
       TestUtils.Simulate.keyDown(
         getSelectedDayNode(datePickerInline),
         getKey("End")
@@ -1921,16 +2319,22 @@ describe("DatePicker", () => {
   });
 
   it("should show the correct start of week for GB locale", () => {
-    registerLocale("en-GB", enGB);
+    const utils = DateUtils(dateFnsProvider);
+    utils.registerLocale("en-GB", enGB);
 
-    const datePicker = mount(<DatePicker locale="en-GB" />);
+    const wrapper = mount(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker locale="en-GB" />
+      </UtilsContextProvider>
+    );
+    const datePicker = wrapper.find(DatePicker).first();
     const dateInput = datePicker.instance().input;
-    const dateInputWrapper = datePicker.find("input");
+    const dateInputWrapper = wrapper.find("input");
     const focusSpy = sandbox.spy(dateInput, "focus");
 
     dateInputWrapper.simulate("focus");
 
-    const firstDay = datePicker
+    const firstDay = wrapper
       .find(".react-datepicker__day-names")
       .childAt(0)
       .text();
@@ -1938,16 +2342,22 @@ describe("DatePicker", () => {
   });
 
   it("should show the correct start of week for US locale", () => {
-    registerLocale("en-US", enUS);
+    const utils = DateUtils(dateFnsProvider);
+    utils.registerLocale("en-US", enUS);
 
-    const datePicker = mount(<DatePicker locale="en-US" />);
+    const wrapper = mount(
+      <UtilsContextProvider utils={utils}>
+        <DatePicker locale="en-US" />
+      </UtilsContextProvider>
+    );
+    const datePicker = wrapper.find(DatePicker).first();
     const dateInput = datePicker.instance().input;
-    const dateInputWrapper = datePicker.find("input");
+    const dateInputWrapper = wrapper.find("input");
     const focusSpy = sandbox.spy(dateInput, "focus");
 
     dateInputWrapper.simulate("focus");
 
-    const firstDay = datePicker
+    const firstDay = wrapper
       .find(".react-datepicker__day-names")
       .childAt(0)
       .text();
@@ -1961,19 +2371,22 @@ describe("DatePicker", () => {
       const selected = utils.newDate("2022-02-24 10:00:00");
       let date;
 
-      const datePicker = TestUtils.renderIntoDocument(
-        <DatePicker
-          selected={selected}
-          onChange={(d) => {
-            console.log("trigger change", d);
-            date = d;
-          }}
-          showTimeSelect
-          showTimeSelectOnly
-          dateFormat={format}
-          timeFormat={format}
-        />
+      const wrapper = TestUtils.renderIntoDocument(
+        <UtilsContextProvider utils={utils}>
+          <DatePicker
+            selected={selected}
+            onChange={(d) => {
+              console.log("trigger change", d);
+              date = d;
+            }}
+            showTimeSelect
+            showTimeSelectOnly
+            dateFormat={format}
+            timeFormat={format}
+          />
+        </UtilsContextProvider>
       );
+      const datePicker = wrapper.children;
 
       const input = ReactDOM.findDOMNode(datePicker.input);
       input.value = "8:22 AM";
