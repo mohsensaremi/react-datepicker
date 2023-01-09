@@ -4,6 +4,7 @@ import ribbon from "./ribbon.png";
 import logo from "./logo.png";
 import DatePicker, { UtilsContextProvider, DateUtils } from "react-datepicker";
 import * as dateFnsProvider from "../../../../provider/date-fns";
+import * as dateFnsJalaliProvider from "../../../../provider/date-fns-jalali";
 
 const Example = () => {
   const [isOpen, setIsOpen] = useState(true);
@@ -36,14 +37,37 @@ const Example = () => {
   );
 };
 
+const utilsProviders = [
+  {
+    label: "date-fns",
+    provider: dateFnsProvider,
+  },
+  {
+    label: "date-fns-jalali",
+    provider: dateFnsJalaliProvider,
+  },
+];
+
 const Root = () => {
-  const utils = useMemo(() => DateUtils(dateFnsProvider), []);
+  const [activeUtilsProvider, setActiveUtilsProvider] = useState(
+    utilsProviders[0].label
+  );
+
+  const utils = useMemo(
+    () =>
+      DateUtils(
+        utilsProviders.find((x) => x.label === activeUtilsProvider).provider
+      ),
+    [activeUtilsProvider]
+  );
+
   return (
     <UtilsContextProvider utils={utils}>
       <div>
         <div className="hero">
           <div className="hero__content">
             <h1 className="hero__title">React Datepicker</h1>
+            <h2>With Utils Provider</h2>
             <div className="hero__crafted-by">
               <a href="https://hackerone.com" className="hero__crafted-by-link">
                 Crafted by{" "}
@@ -56,6 +80,19 @@ const Root = () => {
               </a>
             </div>
             <div className="hero__example">
+              <div className="utils-provider">
+                <label for="utils-provider-select">Utils Provider: </label>
+                <select
+                  id="utils-provider-select"
+                  onChange={(e) => setActiveUtilsProvider(e.target.value)}
+                >
+                  {utilsProviders.map(({ label }) => (
+                    <option key={label} value={label}>
+                      {label}
+                    </option>
+                  ))}
+                </select>
+              </div>
               <Example />
             </div>
           </div>

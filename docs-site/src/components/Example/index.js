@@ -1,17 +1,14 @@
-import React, { forwardRef, useState } from "react";
-import PropTypes from "prop-types";
-import { LiveProvider, LiveEditor, LiveError, LivePreview } from "react-live";
-import DatePicker, {
-  registerLocale,
-  CalendarContainer,
-} from "react-datepicker";
 import * as DateFNS from "date-fns/esm";
+import enGB from "date-fns/locale/en-GB";
 import fi from "date-fns/locale/fi";
 import ptBR from "date-fns/locale/pt-BR";
-import enGB from "date-fns/locale/en-GB";
-import slugify from "slugify";
 import range from "lodash/range";
 import prismGitHubTheme from "prism-react-renderer/themes/github";
+import PropTypes from "prop-types";
+import React, { forwardRef, useState } from "react";
+import DatePicker, { CalendarContainer } from "react-datepicker";
+import { LiveEditor, LiveError, LivePreview, LiveProvider } from "react-live";
+import slugify from "slugify";
 import editIcon from "./edit-regular.svg";
 
 export default class CodeExampleComponent extends React.Component {
