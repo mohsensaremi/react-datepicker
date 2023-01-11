@@ -16,30 +16,77 @@ A simple and reusable Datepicker component for React ([Demo](https://reactdatepi
 The package can be installed via [npm](https://github.com/npm/cli):
 
 ```
-npm install react-datepicker --save
+npm install @karnaval-org/react-datepicker --save
 ```
 
 Or via [yarn](https://github.com/yarnpkg/yarn):
 
 ```
-yarn add react-datepicker
+yarn add @karnaval-org/react-datepicker
 ```
 
 You’ll need to install React and PropTypes separately since those dependencies aren’t included in the package. If you need to use a locale other than the default en-US, you'll also need to import that into your project from date-fns (see Localization section below). Below is a simple example of how to use the Datepicker in a React view. You will also need to require the CSS file from this package (or provide your own). The example below shows how to include the CSS from this package if your build system supports requiring CSS files (Webpack is one that does).
 
+## Utils Context
+
+Since this project is library agnostic, you should first make `DateUtils` object and wrap other components inside `UtilsContextProvider`
+
+```js
+import {
+  DateUtils,
+  UtilsContextProvider,
+} from "@karnaval-org/react-datepicker";
+
+import * as dateFnsProvider from "@karnaval-org/react-datepicker/provider/date-fns";
+
+const utils = DateUtils(/* your utils provider implementation */);
+
+const Example = () => {
+  // other codes
+
+  return (
+    <UtilsContextProvider utils={utils}>
+      <DatePicker
+      // props
+      />
+    </UtilsContextProvider>
+  );
+};
+```
+
+To see list of functions needed to be implemented for utils provider, open `/src/date_utils_provider.js`
+
+For ease of use, there are already implemented utils providers inside `/provider` directory.
+
+- `date-fns` for gregorian calendars
+- `date-fns-jalali` for jalali calendars
+
+Here is the full example using `date-fns` utils provider
+
 ```js
 import React, { useState } from "react";
-import DatePicker from "react-datepicker";
+import DatePicker, {
+  UtilsContextProvider,
+  DateUtils,
+} from "@karnaval-org/react-datepicker";
+import * as dateFnsProvider from "@karnaval-org/react-datepicker/provider/date-fns";
 
-import "react-datepicker/dist/react-datepicker.css";
+import "@karnaval-org/react-datepicker/dist/react-datepicker.css";
 
 // CSS Modules, react-datepicker-cssmodules.css
-// import 'react-datepicker/dist/react-datepicker-cssmodules.css';
+// import '@karnaval-org/react-datepicker/dist/react-datepicker-cssmodules.css';
+
+const utils = DateUtils(dateFnsProvider);
 
 const Example = () => {
   const [startDate, setStartDate] = useState(new Date());
   return (
-    <DatePicker selected={startDate} onChange={(date) => setStartDate(date)} />
+    <UtilsContextProvider utils={utils}>
+      <DatePicker
+        selected={startDate}
+        onChange={(date) => setStartDate(date)}
+      />
+    </UtilsContextProvider>
   );
 };
 ```
