@@ -21,5 +21,5 @@ git push --tags
 
 yarn run build
 
-npm publish
+npm publish --legacy-peer-deps --access public
 
