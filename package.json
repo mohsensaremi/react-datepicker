@@ -1,10 +1,10 @@
 {
   "author": "HackerOne",
-  "name": "react-datepicker",
+  "name": "@karnaval/react-datepicker",
   "description": "A simple and reusable datepicker component for React",
-  "version": "4.8.0",
+  "version": "4.9.0",
   "license": "MIT",
-  "homepage": "https://github.com/Hacker0x01/react-datepicker",
+  "homepage": "https://github.com/mohsensaremi/react-datepicker",
   "main": "dist/index.js",
   "browser": "dist/react-datepicker.min.js",
   "module": "dist/es/index.js",
@@ -15,7 +15,8 @@
     "dist",
     "lib",
     "es",
-    "src/stylesheets"
+    "src/stylesheets",
+    "provider"
   ],
   "sideEffects": [
     "**/*.css"
@@ -25,14 +26,18 @@
     "datepicker",
     "calendar",
     "date",
-    "react-component"
+    "react-component",
+    "jalali",
+    "shamsi",
+    "khorshidi",
+    "persian"
   ],
   "repository": {
     "type": "git",
-    "url": "git://github.com/Hacker0x01/react-datepicker.git"
+    "url": "git://github.com/mohsensaremi/react-datepicker.git"
   },
   "bugs": {
-    "url": "https://github.com/Hacker0x01/react-datepicker/issues"
+    "url": "https://github.com/mohsensaremi/react-datepicker/issues"
   },
   "devDependencies": {
     "@babel/core": "^7.5.5",
@@ -156,5 +161,10 @@
       "prettier --write",
       "git add"
     ]
+  },
+  "directories": {
+    "doc": "docs",
+    "example": "examples",
+    "test": "test"
   }
 }
