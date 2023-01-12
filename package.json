@@ -2,10 +2,11 @@
   "author": "HackerOne",
   "name": "@karnaval-org/react-datepicker",
   "description": "A simple and reusable datepicker component for React",
-  "version": "4.9.1",
+  "version": "4.9.2",
   "license": "MIT",
   "homepage": "https://github.com/mohsensaremi/react-datepicker",
   "main": "dist/index.js",
+  "typings": "@types/index.d.ts",
   "browser": "dist/react-datepicker.min.js",
   "module": "dist/es/index.js",
   "unpkg": "dist/react-datepicker.min.js",
@@ -16,7 +17,8 @@
     "lib",
     "es",
     "src/stylesheets",
-    "provider"
+    "provider",
+    "@types"
   ],
   "sideEffects": [
     "**/*.css"
@@ -47,6 +49,7 @@
     "@babel/preset-env": "^7.5.5",
     "@babel/preset-flow": "^7.0.0",
     "@babel/preset-react": "^7.0.0",
+    "@types/react-datepicker": "^4.8.0",
     "@wojtekmaj/enzyme-adapter-react-17": "^0.6.1",
     "axe-core": "^4.4.1",
     "babel-eslint": "^10.0.3",
