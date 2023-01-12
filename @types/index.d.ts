@@ -229,4 +229,23 @@ declare module "@karnaval-org/react-datepicker" {
   }
 
   export default ReactDatePicker;
+
+  export interface UtilsContextProviderProps {
+    children: React.ReactNode;
+    utils?: object;
+    provider?: object;
+  }
+
+  export const UtilsContextProvider: React.ComponentType<UtilsContextProviderProps>;
+  export const DateUtils: (utils: object) => object;
+}
+
+declare module "@karnaval-org/react-datepicker/provider/date-fns" {
+  const content: object;
+  export default content;
+}
+
+declare module "@karnaval-org/react-datepicker/provider/date-fns-jalali" {
+  const content: object;
+  export default content;
 }
