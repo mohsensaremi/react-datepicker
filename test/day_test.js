@@ -3,7 +3,7 @@ import { mount } from "enzyme";
 import defer from "lodash/defer";
 import React from "react";
 import sinon from "sinon";
-import * as dateFnsProvider from "../provider/date-fns";
+import dateFnsProvider from "../provider/date-fns";
 import { UtilsContextProvider } from "../src/context";
 import { DateUtils } from "../src/date_utils";
 import Day from "../src/day";

@@ -1,7 +1,7 @@
 import ptBR from "date-fns/locale/pt-BR";
 import { mount } from "enzyme";
 import React from "react";
-import * as dateFnsProvider from "../provider/date-fns";
+import dateFnsProvider from "../provider/date-fns";
 import { UtilsContextProvider } from "../src/context";
 import { DateUtils } from "../src/date_utils";
 import TimeComponent from "../src/time";

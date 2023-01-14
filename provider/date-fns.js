@@ -1,59 +1,65 @@
-export { default as isDate } from "date-fns/isDate";
-export { default as isValidDate } from "date-fns/isValid";
-export { default as format } from "date-fns/format";
-export { default as addMinutes } from "date-fns/addMinutes";
-export { default as addHours } from "date-fns/addHours";
-export { default as addDays } from "date-fns/addDays";
-export { default as addWeeks } from "date-fns/addWeeks";
-export { default as addMonths } from "date-fns/addMonths";
-export { default as addYears } from "date-fns/addYears";
-export { default as addQuarters } from "date-fns/addQuarters";
-export { default as subMinutes } from "date-fns/subMinutes";
-export { default as subHours } from "date-fns/subHours";
-export { default as subDays } from "date-fns/subDays";
-export { default as subWeeks } from "date-fns/subWeeks";
-export { default as subMonths } from "date-fns/subMonths";
-export { default as subYears } from "date-fns/subYears";
-export { default as getSeconds } from "date-fns/getSeconds";
-export { default as getMinutes } from "date-fns/getMinutes";
-export { default as getHours } from "date-fns/getHours";
-export { default as getDay } from "date-fns/getDay";
-export { default as getDate } from "date-fns/getDate";
-export { default as getISOWeek } from "date-fns/getISOWeek";
-export { default as getMonth } from "date-fns/getMonth";
-export { default as getQuarter } from "date-fns/getQuarter";
-export { default as getYear } from "date-fns/getYear";
-export { default as getTime } from "date-fns/getTime";
-export { default as setSeconds } from "date-fns/setSeconds";
-export { default as setMinutes } from "date-fns/setMinutes";
-export { default as setHours } from "date-fns/setHours";
-export { default as setMonth } from "date-fns/setMonth";
-export { default as setQuarter } from "date-fns/setQuarter";
-export { default as setYear } from "date-fns/setYear";
-export { default as min } from "date-fns/min";
-export { default as max } from "date-fns/max";
-export { default as differenceInCalendarDays } from "date-fns/differenceInCalendarDays";
-export { default as differenceInCalendarMonths } from "date-fns/differenceInCalendarMonths";
-export { default as differenceInCalendarWeeks } from "date-fns/differenceInCalendarWeeks";
-export { default as differenceInCalendarYears } from "date-fns/differenceInCalendarYears";
-export { default as startOfDay } from "date-fns/startOfDay";
-export { default as startOfWeek } from "date-fns/startOfWeek";
-export { default as startOfMonth } from "date-fns/startOfMonth";
-export { default as startOfQuarter } from "date-fns/startOfQuarter";
-export { default as startOfYear } from "date-fns/startOfYear";
-export { default as endOfDay } from "date-fns/endOfDay";
-export { default as endOfWeek } from "date-fns/endOfWeek";
-export { default as endOfMonth } from "date-fns/endOfMonth";
-export { default as isEqual } from "date-fns/isEqual";
-export { default as isSameDay } from "date-fns/isSameDay";
-export { default as isSameMonth } from "date-fns/isSameMonth";
-export { default as isSameYear } from "date-fns/isSameYear";
-export { default as isSameQuarter } from "date-fns/isSameQuarter";
-export { default as isAfter } from "date-fns/isAfter";
-export { default as isBefore } from "date-fns/isBefore";
-export { default as isWithinInterval } from "date-fns/isWithinInterval";
-export { default as toDate } from "date-fns/toDate";
-export { default as parse } from "date-fns/parse";
-export { default as parseISO } from "date-fns/parseISO";
-export { default as set } from "date-fns/set";
-export { default as longFormatters } from "date-fns/esm/_lib/format/longFormatters";
+module.exports = {
+  isDate: require("date-fns/isDate").default,
+  isValidDate: require("date-fns/isValid").default,
+  format: require("date-fns/format").default,
+  addMinutes: require("date-fns/addMinutes").default,
+  addHours: require("date-fns/addHours").default,
+  addDays: require("date-fns/addDays").default,
+  addWeeks: require("date-fns/addWeeks").default,
+  addMonths: require("date-fns/addMonths").default,
+  addYears: require("date-fns/addYears").default,
+  addQuarters: require("date-fns/addQuarters").default,
+  subMinutes: require("date-fns/subMinutes").default,
+  subHours: require("date-fns/subHours").default,
+  subDays: require("date-fns/subDays").default,
+  subWeeks: require("date-fns/subWeeks").default,
+  subMonths: require("date-fns/subMonths").default,
+  subYears: require("date-fns/subYears").default,
+  getSeconds: require("date-fns/getSeconds").default,
+  getMinutes: require("date-fns/getMinutes").default,
+  getHours: require("date-fns/getHours").default,
+  getDay: require("date-fns/getDay").default,
+  getDate: require("date-fns/getDate").default,
+  getISOWeek: require("date-fns/getISOWeek").default,
+  getMonth: require("date-fns/getMonth").default,
+  getQuarter: require("date-fns/getQuarter").default,
+  getYear: require("date-fns/getYear").default,
+  getTime: require("date-fns/getTime").default,
+  setSeconds: require("date-fns/setSeconds").default,
+  setMinutes: require("date-fns/setMinutes").default,
+  setHours: require("date-fns/setHours").default,
+  setMonth: require("date-fns/setMonth").default,
+  setQuarter: require("date-fns/setQuarter").default,
+  setYear: require("date-fns/setYear").default,
+  min: require("date-fns/min").default,
+  max: require("date-fns/max").default,
+  differenceInCalendarDays: require("date-fns/differenceInCalendarDays")
+    .default,
+  differenceInCalendarMonths: require("date-fns/differenceInCalendarMonths")
+    .default,
+  differenceInCalendarWeeks: require("date-fns/differenceInCalendarWeeks")
+    .default,
+  differenceInCalendarYears: require("date-fns/differenceInCalendarYears")
+    .default,
+  startOfDay: require("date-fns/startOfDay").default,
+  startOfWeek: require("date-fns/startOfWeek").default,
+  startOfMonth: require("date-fns/startOfMonth").default,
+  startOfQuarter: require("date-fns/startOfQuarter").default,
+  startOfYear: require("date-fns/startOfYear").default,
+  endOfDay: require("date-fns/endOfDay").default,
+  endOfWeek: require("date-fns/endOfWeek").default,
+  endOfMonth: require("date-fns/endOfMonth").default,
+  isEqual: require("date-fns/isEqual").default,
+  isSameDay: require("date-fns/isSameDay").default,
+  isSameMonth: require("date-fns/isSameMonth").default,
+  isSameYear: require("date-fns/isSameYear").default,
+  isSameQuarter: require("date-fns/isSameQuarter").default,
+  isAfter: require("date-fns/isAfter").default,
+  isBefore: require("date-fns/isBefore").default,
+  isWithinInterval: require("date-fns/isWithinInterval").default,
+  toDate: require("date-fns/toDate").default,
+  parse: require("date-fns/parse").default,
+  parseISO: require("date-fns/parseISO").default,
+  set: require("date-fns/set").default,
+  longFormatters: require("date-fns/_lib/format/longFormatters"),
+};

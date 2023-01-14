@@ -6,7 +6,7 @@ import TestUtils from "react-dom/test-utils";
 import { create } from "react-test-renderer";
 import ReactDOM from "react-dom";
 import Calendar from "../src/calendar";
-import * as dateFnsProvider from "../provider/date-fns";
+import dateFnsProvider from "../provider/date-fns";
 import { UtilsContextProvider } from "../src/context";
 import { DEFAULT_YEAR_ITEM_NUMBER, DateUtils } from "../src/date_utils";
 

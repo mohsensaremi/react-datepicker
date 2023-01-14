@@ -3,7 +3,7 @@ import range from "lodash/range";
 import YearDropdown from "../src/year_dropdown.jsx";
 import YearDropdownOptions from "../src/year_dropdown_options.jsx";
 import { mount } from "enzyme";
-import * as dateFnsProvider from "../provider/date-fns";
+import dateFnsProvider from "../provider/date-fns";
 import { UtilsContextProvider } from "../src/context";
 import { DateUtils } from "../src/date_utils";
 

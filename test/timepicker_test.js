@@ -3,7 +3,7 @@ import DatePicker from "../src/index.jsx";
 import TestUtils from "react-dom/test-utils";
 import ReactDOM from "react-dom";
 import Time from "../src/time";
-import * as dateFnsProvider from "../provider/date-fns";
+import dateFnsProvider from "../provider/date-fns";
 import { UtilsContextProvider } from "../src/context";
 import { DateUtils } from "../src/date_utils";
 

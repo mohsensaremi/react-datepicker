@@ -6,7 +6,7 @@ import ReactDOM from "react-dom";
 import TestUtils from "react-dom/test-utils";
 import { withContext } from "shallow-with-context";
 import sinon from "sinon";
-import * as dateFnsProvider from "../provider/date-fns";
+import dateFnsProvider from "../provider/date-fns";
 import Calendar from "../src/calendar";
 import { UtilsContextProvider } from "../src/context";
 import { DateUtils } from "../src/date_utils";

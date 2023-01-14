@@ -37,7 +37,7 @@ import {
   UtilsContextProvider,
 } from "@karnaval-org/react-datepicker";
 
-import * as dateFnsProvider from "@karnaval-org/react-datepicker/provider/date-fns";
+import dateFnsProvider from "@karnaval-org/react-datepicker/provider/date-fns";
 
 const utils = DateUtils(/* your utils provider implementation */);
 
@@ -69,7 +69,7 @@ import DatePicker, {
   UtilsContextProvider,
   DateUtils,
 } from "@karnaval-org/react-datepicker";
-import * as dateFnsProvider from "@karnaval-org/react-datepicker/provider/date-fns";
+import dateFnsProvider from "@karnaval-org/react-datepicker/provider/date-fns";
 
 import "@karnaval-org/react-datepicker/dist/react-datepicker.css";
 

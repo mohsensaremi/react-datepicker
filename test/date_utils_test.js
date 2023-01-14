@@ -1,7 +1,7 @@
 import ptBR from "date-fns/locale/pt-BR";
-import * as dateFnsProvider from "../provider/date-fns";
+import dateFnsProvider from "../provider/date-fns";
 import { DateUtils } from "../src/date_utils";
-
+console.log("dateFnsProviderdateFnsProviderdateFnsProvider", dateFnsProvider);
 describe("date-fns provider", () => {
   const utils = DateUtils(dateFnsProvider);
 

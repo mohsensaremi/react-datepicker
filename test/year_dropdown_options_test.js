@@ -1,7 +1,7 @@
 import React from "react";
 import YearDropdownOptions from "../src/year_dropdown_options.jsx";
 import { mount, shallow } from "enzyme";
-import * as dateFnsProvider from "../provider/date-fns";
+import dateFnsProvider from "../provider/date-fns";
 import { UtilsContextProvider } from "../src/context";
 import { DateUtils } from "../src/date_utils";
 const utils = DateUtils(dateFnsProvider);

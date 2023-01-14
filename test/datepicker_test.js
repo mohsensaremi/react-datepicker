@@ -4,7 +4,7 @@ import defer from "lodash/defer";
 import React from "react";
 import ReactDOM from "react-dom";
 import TestUtils from "react-dom/test-utils";
-import * as dateFnsProvider from "../provider/date-fns";
+import dateFnsProvider from "../provider/date-fns";
 import { UtilsContextProvider } from "../src/context";
 import { DateUtils } from "../src/date_utils";
 import Day from "../src/day";

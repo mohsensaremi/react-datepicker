@@ -2,7 +2,7 @@ import React from "react";
 import { mount } from "enzyme";
 import DatePicker from "../src/index.jsx";
 import TimeComponent from "../src/time";
-import * as dateFnsProvider from "../provider/date-fns";
+import dateFnsProvider from "../provider/date-fns";
 import { UtilsContextProvider } from "../src/context";
 import { DateUtils } from "../src/date_utils";
 

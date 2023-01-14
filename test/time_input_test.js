@@ -1,7 +1,7 @@
 import { mount, shallow } from "enzyme";
 import defer from "lodash/defer";
 import React from "react";
-import * as dateFnsProvider from "../provider/date-fns";
+import dateFnsProvider from "../provider/date-fns";
 import { UtilsContextProvider } from "../src/context";
 import { DateUtils } from "../src/date_utils";
 import DatePicker from "../src/index.jsx";

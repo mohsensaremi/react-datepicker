@@ -2,7 +2,7 @@ import { shallow } from "enzyme";
 import React from "react";
 import { withContext } from "shallow-with-context";
 import sinon from "sinon";
-import * as dateFnsProvider from "../provider/date-fns";
+import dateFnsProvider from "../provider/date-fns";
 import { DateUtils } from "../src/date_utils";
 import Day from "../src/day";
 import Week from "../src/week";

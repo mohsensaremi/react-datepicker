@@ -3,8 +3,8 @@ import ExampleComponents from "../Examples";
 import ribbon from "./ribbon.png";
 import logo from "./logo.png";
 import DatePicker, { UtilsContextProvider, DateUtils } from "react-datepicker";
-import * as dateFnsProvider from "../../../../provider/date-fns";
-import * as dateFnsJalaliProvider from "../../../../provider/date-fns-jalali";
+import dateFnsProvider from "../../../../provider/date-fns";
+import dateFnsJalaliProvider from "../../../../provider/date-fns-jalali";
 
 const Example = () => {
   const [isOpen, setIsOpen] = useState(true);

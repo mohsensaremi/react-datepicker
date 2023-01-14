@@ -3,7 +3,7 @@ import MonthYearDropdown from "../src/month_year_dropdown.jsx";
 import MonthYearDropdownOptions from "../src/month_year_dropdown_options.jsx";
 import { mount } from "enzyme";
 import fi from "date-fns/locale/fi";
-import * as dateFnsProvider from "../provider/date-fns";
+import dateFnsProvider from "../provider/date-fns";
 import { UtilsContextProvider } from "../src/context";
 import { DateUtils } from "../src/date_utils";
 

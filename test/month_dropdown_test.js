@@ -6,7 +6,7 @@ import { mount } from "enzyme";
 import zh_cn from "date-fns/locale/zh-CN";
 import el from "date-fns/locale/el";
 import ru from "date-fns/locale/ru";
-import * as dateFnsProvider from "../provider/date-fns";
+import dateFnsProvider from "../provider/date-fns";
 import { UtilsContextProvider } from "../src/context";
 import { DateUtils } from "../src/date_utils";
 

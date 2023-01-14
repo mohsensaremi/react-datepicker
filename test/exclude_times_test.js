@@ -3,7 +3,7 @@ import { mount } from "enzyme";
 import DatePicker from "../src/index.jsx";
 import { UtilsContextProvider } from "../src/context";
 import { DateUtils } from "../src/date_utils";
-import * as dateFnsProvider from "../provider/date-fns";
+import dateFnsProvider from "../provider/date-fns";
 
 describe("DatePicker", () => {
   const utils = DateUtils(dateFnsProvider);

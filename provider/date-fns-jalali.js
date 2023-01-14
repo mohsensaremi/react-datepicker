@@ -1,59 +1,65 @@
-export { default as isDate } from "date-fns-jalali/isDate";
-export { default as isValidDate } from "date-fns-jalali/isValid";
-export { default as format } from "date-fns-jalali/format";
-export { default as addMinutes } from "date-fns-jalali/addMinutes";
-export { default as addHours } from "date-fns-jalali/addHours";
-export { default as addDays } from "date-fns-jalali/addDays";
-export { default as addWeeks } from "date-fns-jalali/addWeeks";
-export { default as addMonths } from "date-fns-jalali/addMonths";
-export { default as addYears } from "date-fns-jalali/addYears";
-export { default as addQuarters } from "date-fns-jalali/addQuarters";
-export { default as subMinutes } from "date-fns-jalali/subMinutes";
-export { default as subHours } from "date-fns-jalali/subHours";
-export { default as subDays } from "date-fns-jalali/subDays";
-export { default as subWeeks } from "date-fns-jalali/subWeeks";
-export { default as subMonths } from "date-fns-jalali/subMonths";
-export { default as subYears } from "date-fns-jalali/subYears";
-export { default as getSeconds } from "date-fns-jalali/getSeconds";
-export { default as getMinutes } from "date-fns-jalali/getMinutes";
-export { default as getHours } from "date-fns-jalali/getHours";
-export { default as getDay } from "date-fns-jalali/getDay";
-export { default as getDate } from "date-fns-jalali/getDate";
-export { default as getISOWeek } from "date-fns-jalali/getISOWeek";
-export { default as getMonth } from "date-fns-jalali/getMonth";
-export { default as getQuarter } from "date-fns-jalali/getQuarter";
-export { default as getYear } from "date-fns-jalali/getYear";
-export { default as getTime } from "date-fns-jalali/getTime";
-export { default as setSeconds } from "date-fns-jalali/setSeconds";
-export { default as setMinutes } from "date-fns-jalali/setMinutes";
-export { default as setHours } from "date-fns-jalali/setHours";
-export { default as setMonth } from "date-fns-jalali/setMonth";
-export { default as setQuarter } from "date-fns-jalali/setQuarter";
-export { default as setYear } from "date-fns-jalali/setYear";
-export { default as min } from "date-fns-jalali/min";
-export { default as max } from "date-fns-jalali/max";
-export { default as differenceInCalendarDays } from "date-fns-jalali/differenceInCalendarDays";
-export { default as differenceInCalendarMonths } from "date-fns-jalali/differenceInCalendarMonths";
-export { default as differenceInCalendarWeeks } from "date-fns-jalali/differenceInCalendarWeeks";
-export { default as differenceInCalendarYears } from "date-fns-jalali/differenceInCalendarYears";
-export { default as startOfDay } from "date-fns-jalali/startOfDay";
-export { default as startOfWeek } from "date-fns-jalali/startOfWeek";
-export { default as startOfMonth } from "date-fns-jalali/startOfMonth";
-export { default as startOfQuarter } from "date-fns-jalali/startOfQuarter";
-export { default as startOfYear } from "date-fns-jalali/startOfYear";
-export { default as endOfDay } from "date-fns-jalali/endOfDay";
-export { default as endOfWeek } from "date-fns-jalali/endOfWeek";
-export { default as endOfMonth } from "date-fns-jalali/endOfMonth";
-export { default as isEqual } from "date-fns-jalali/isEqual";
-export { default as isSameDay } from "date-fns-jalali/isSameDay";
-export { default as isSameMonth } from "date-fns-jalali/isSameMonth";
-export { default as isSameYear } from "date-fns-jalali/isSameYear";
-export { default as isSameQuarter } from "date-fns-jalali/isSameQuarter";
-export { default as isAfter } from "date-fns-jalali/isAfter";
-export { default as isBefore } from "date-fns-jalali/isBefore";
-export { default as isWithinInterval } from "date-fns-jalali/isWithinInterval";
-export { default as toDate } from "date-fns-jalali/toDate";
-export { default as parse } from "date-fns-jalali/parse";
-export { default as parseISO } from "date-fns-jalali/parseISO";
-export { default as set } from "date-fns-jalali/set";
-export { default as longFormatters } from "date-fns-jalali/esm/_lib/format/longFormatters";
+module.exports = {
+  isDate: require("date-fns-jalali/isDate").default,
+  isValidDate: require("date-fns-jalali/isValid").default,
+  format: require("date-fns-jalali/format").default,
+  addMinutes: require("date-fns-jalali/addMinutes").default,
+  addHours: require("date-fns-jalali/addHours").default,
+  addDays: require("date-fns-jalali/addDays").default,
+  addWeeks: require("date-fns-jalali/addWeeks").default,
+  addMonths: require("date-fns-jalali/addMonths").default,
+  addYears: require("date-fns-jalali/addYears").default,
+  addQuarters: require("date-fns-jalali/addQuarters").default,
+  subMinutes: require("date-fns-jalali/subMinutes").default,
+  subHours: require("date-fns-jalali/subHours").default,
+  subDays: require("date-fns-jalali/subDays").default,
+  subWeeks: require("date-fns-jalali/subWeeks").default,
+  subMonths: require("date-fns-jalali/subMonths").default,
+  subYears: require("date-fns-jalali/subYears").default,
+  getSeconds: require("date-fns-jalali/getSeconds").default,
+  getMinutes: require("date-fns-jalali/getMinutes").default,
+  getHours: require("date-fns-jalali/getHours").default,
+  getDay: require("date-fns-jalali/getDay").default,
+  getDate: require("date-fns-jalali/getDate").default,
+  getISOWeek: require("date-fns-jalali/getISOWeek").default,
+  getMonth: require("date-fns-jalali/getMonth").default,
+  getQuarter: require("date-fns-jalali/getQuarter").default,
+  getYear: require("date-fns-jalali/getYear").default,
+  getTime: require("date-fns-jalali/getTime").default,
+  setSeconds: require("date-fns-jalali/setSeconds").default,
+  setMinutes: require("date-fns-jalali/setMinutes").default,
+  setHours: require("date-fns-jalali/setHours").default,
+  setMonth: require("date-fns-jalali/setMonth").default,
+  setQuarter: require("date-fns-jalali/setQuarter").default,
+  setYear: require("date-fns-jalali/setYear").default,
+  min: require("date-fns-jalali/min").default,
+  max: require("date-fns-jalali/max").default,
+  differenceInCalendarDays: require("date-fns-jalali/differenceInCalendarDays")
+    .default,
+  differenceInCalendarMonths:
+    require("date-fns-jalali/differenceInCalendarMonths").default,
+  differenceInCalendarWeeks:
+    require("date-fns-jalali/differenceInCalendarWeeks").default,
+  differenceInCalendarYears:
+    require("date-fns-jalali/differenceInCalendarYears").default,
+  startOfDay: require("date-fns-jalali/startOfDay").default,
+  startOfWeek: require("date-fns-jalali/startOfWeek").default,
+  startOfMonth: require("date-fns-jalali/startOfMonth").default,
+  startOfQuarter: require("date-fns-jalali/startOfQuarter").default,
+  startOfYear: require("date-fns-jalali/startOfYear").default,
+  endOfDay: require("date-fns-jalali/endOfDay").default,
+  endOfWeek: require("date-fns-jalali/endOfWeek").default,
+  endOfMonth: require("date-fns-jalali/endOfMonth").default,
+  isEqual: require("date-fns-jalali/isEqual").default,
+  isSameDay: require("date-fns-jalali/isSameDay").default,
+  isSameMonth: require("date-fns-jalali/isSameMonth").default,
+  isSameYear: require("date-fns-jalali/isSameYear").default,
+  isSameQuarter: require("date-fns-jalali/isSameQuarter").default,
+  isAfter: require("date-fns-jalali/isAfter").default,
+  isBefore: require("date-fns-jalali/isBefore").default,
+  isWithinInterval: require("date-fns-jalali/isWithinInterval").default,
+  toDate: require("date-fns-jalali/toDate").default,
+  parse: require("date-fns-jalali/parse").default,
+  parseISO: require("date-fns-jalali/parseISO").default,
+  set: require("date-fns-jalali/set").default,
+  longFormatters: require("date-fns-jalali/_lib/format/longFormatters"),
+};

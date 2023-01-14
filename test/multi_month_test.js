@@ -1,7 +1,7 @@
 import { shallow } from "enzyme";
 import React from "react";
 import { withContext } from "shallow-with-context";
-import * as dateFnsProvider from "../provider/date-fns";
+import dateFnsProvider from "../provider/date-fns";
 import Calendar from "../src/calendar";
 import { DateUtils } from "../src/date_utils";
 import Month from "../src/month";
