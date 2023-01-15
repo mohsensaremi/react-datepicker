@@ -2,7 +2,7 @@
   "author": "HackerOne",
   "name": "@karnaval-org/react-datepicker",
   "description": "A simple and reusable datepicker component for React",
-  "version": "4.9.7",
+  "version": "4.9.8",
   "license": "MIT",
   "homepage": "https://github.com/mohsensaremi/react-datepicker",
   "main": "dist/index.js",
@@ -17,7 +17,6 @@
     "lib",
     "es",
     "src/stylesheets",
-    "provider",
     "@types"
   ],
   "sideEffects": [
