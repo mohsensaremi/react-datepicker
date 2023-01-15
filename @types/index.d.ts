@@ -240,12 +240,12 @@ declare module "@karnaval-org/react-datepicker" {
   export const DateUtils: (utils: object) => object;
 }
 
-declare module "@karnaval-org/react-datepicker/provider/date-fns" {
+declare module "@karnaval-org/react-datepicker/dist/provider/date-fns" {
   const content: object;
   export default content;
 }
 
-declare module "@karnaval-org/react-datepicker/provider/date-fns-jalali" {
+declare module "@karnaval-org/react-datepicker/dist/provider/date-fns-jalali" {
   const content: object;
   export default content;
 }
