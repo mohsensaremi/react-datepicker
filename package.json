@@ -17,6 +17,7 @@
     "lib",
     "es",
     "src/stylesheets",
+    "provider",
     "@types"
   ],
   "sideEffects": [
