@@ -155,6 +155,7 @@
     "css:dev": "sass --style expanded src/stylesheets/datepicker.scss > dist/react-datepicker.css",
     "css:modules:dev": "sass --style expanded src/stylesheets/datepicker-cssmodules.scss | tee dist/react-datepicker-cssmodules.css dist/react-datepicker.module.css",
     "build:js": "rollup -c",
+    "build:provider": "rollup -c rollup-date-fns-provider.config.js && rollup -c rollup-date-fns-jalali-provider.config.js",
     "js:dev": "rollup -cw",
     "prepare": "install-peers && husky install"
   },
